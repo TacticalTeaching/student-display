@@ -536,29 +536,21 @@
       align-items: start;
     }
 
-    /* Decimal point drawn in the gap after a digit, so the columns stay lined up */
-    .cell.has-point {
-      position: relative;
-    }
-
-    .cell.has-point::after {
-      content: "";
-      position: absolute;
-      right: calc(var(--cell) * -0.13);
-      bottom: calc(var(--cell) * 0.1);
-      width: calc(var(--cell) * 0.12);
-      height: calc(var(--cell) * 0.12);
-      border-radius: 50%;
-      background: var(--ink);
-    }
 
     .cell.answer.is-zero {
       border-style: dashed;
     }
 
-    .cell.answer.is-point-next {
-      box-shadow: 0 0 0 3px rgba(49, 95, 159, 0.35);
-      border-color: var(--blue);
+    /* Where the decimal point goes in the answer, waiting to be placed */
+    .cell.point.point-next {
+      border: 2px solid var(--blue);
+      border-radius: 6px;
+      background: #f5f8fb;
+      box-shadow: 0 0 0 3px rgba(49, 95, 159, 0.22);
+      color: var(--blue);
+      font-size: calc(var(--cell) * 0.32);
+      align-items: center;
+      padding: 0;
       cursor: pointer;
     }
 
@@ -1077,7 +1069,12 @@
       const pointNext = next.includes("point");
 
       board.innerHTML = "";
-      board.style.gridTemplateColumns = `repeat(${q.n + 1}, var(--cell))`;
+      const columnSizes = ["var(--cell)"];
+      for (let col = 0; col < q.n; col++) {
+        columnSizes.push("var(--cell)");
+        if (col === q.pointCol) columnSizes.push("calc(var(--cell) * 0.4)");
+      }
+      board.style.gridTemplateColumns = columnSizes.join(" ");
 
       rowOrder().forEach(name => {
         if (name === "rule") {
@@ -1098,6 +1095,32 @@
         }
 
         for (let col = 0; col < q.n; col++) {
+          renderColumn(name, col, isCarryRow, done, next, secondRowStarted);
+          if (col === q.pointCol) board.appendChild(pointCell(name, pointShown, pointNext));
+        }
+      });
+    }
+
+    // Narrow decimal-point column: the point shows in the top number, and in the answer once placed
+    function pointCell(name, pointShown, pointNext) {
+      if (name === "top") return makeCell("point", ".");
+      if (name === question.finalRow) {
+        if (pointShown) return makeCell("point", ".");
+        if (pointNext) {
+          const slot = document.createElement("button");
+          slot.type = "button";
+          slot.className = "cell point point-next";
+          slot.textContent = "?";
+          slot.addEventListener("click", revealNext);
+          return slot;
+        }
+      }
+      return document.createElement("div");
+    }
+
+    function renderColumn(name, col, isCarryRow, done, next, secondRowStarted) {
+      const q = question;
+      {
           const value = q.rows[name][col];
           const id = `${name}-${col}`;
 
@@ -1120,23 +1143,21 @@
               slot.appendChild(box);
             }
             board.appendChild(slot);
-            continue;
+            return;
           }
 
           if (value === null) {
             board.appendChild(makeCell("", ""));
-            continue;
+            return;
           }
 
           if (name === "top" || name === "mult") {
             const cell = makeCell("digit", String(value));
-            if (name === "top" && col === q.pointCol) cell.classList.add("has-point");
             board.appendChild(cell);
-            continue;
+            return;
           }
 
           // Working rows: p1, p2 and ans
-          const isFinal = name === q.finalRow;
           const cell = document.createElement("button");
           cell.type = "button";
           cell.className = "cell answer";
@@ -1144,13 +1165,6 @@
             cell.classList.add("is-revealed");
             if (name === "p2" && col === q.n - 1) cell.classList.add("is-zero");
             cell.textContent = String(value);
-            if (isFinal && col === q.pointCol) {
-              if (pointShown) cell.classList.add("has-point");
-              if (pointNext) {
-                cell.classList.add("is-point-next");
-                cell.addEventListener("click", revealNext);
-              }
-            }
           } else {
             cell.textContent = "?";
             if (next.includes(id) && next[0] === id) {
@@ -1161,8 +1175,7 @@
             }
           }
           board.appendChild(cell);
-        }
-      });
+      }
     }
 
     // Size the boxes so the whole workout fits the space without scrolling
@@ -1171,7 +1184,7 @@
       const digitRows = order.filter(name => ["top", "mult", "p1", "p2", "ans"].includes(name)).length;
       const carryRows = order.filter(name => ["c1", "c2", "cs"].includes(name)).length;
       const rules = order.filter(name => name === "rule").length;
-      const widthUnits = (question.n + 1) + question.n * 0.14;
+      const widthUnits = (question.n + 1) + question.n * 0.14 + (question.pointCol !== null ? 0.54 : 0);
       const heightUnits = digitRows + carryRows * 0.42 + rules * 0.07 + (order.length - 1) * 0.14;
       const availableWidth = boardArea.clientWidth * 0.94;
       const availableHeight = boardArea.clientHeight * 0.94;
