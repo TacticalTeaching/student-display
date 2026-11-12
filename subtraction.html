@@ -573,6 +573,27 @@
       background: var(--red);
     }
 
+    /* The decimal point sits small and low in the gap, level with the bottom of the boxes */
+    .cell.has-point,
+    .cell.point-pending {
+      position: relative;
+      overflow: visible;
+    }
+
+    .cell.has-point::after,
+    .cell.point-pending::after {
+      content: "";
+      position: absolute;
+      --dot: max(4px, calc(var(--cell) * 0.06));
+      /* Measured from inside the 2px border, so add the border to centre it in the gap */
+      right: calc(var(--cell) * -0.07 - var(--dot) / 2 - 2px);
+      bottom: 0;
+      width: var(--dot);
+      height: var(--dot);
+      border-radius: 50%;
+      background: var(--ink);
+    }
+
     .step-text {
       margin: 0;
       min-height: clamp(38px, 6vh, 56px);
@@ -1039,14 +1060,19 @@
       yearBadgeText.textContent = yearSettings[currentYear].detail;
     }
 
-    // Column layout: operator column, then digit columns with a narrow decimal-point column
+    // Column layout: operator column, then digit columns. The decimal point is drawn small and low
+    // in the gap after the ones digit, so every column keeps the same spacing.
     function layoutColumns() {
       const layout = [{ type: "op" }];
       for (let i = 0; i < question.columns; i++) {
-        if (question.dp && i === question.columns - question.dp) layout.push({ type: "point" });
-        layout.push({ type: "digit", col: i });
+        layout.push({ type: "digit", col: i, pointAfter: Boolean(question.dp) && i === question.columns - question.dp - 1 });
       }
       return layout;
+    }
+
+    function withPoint(cell, item) {
+      if (item.pointAfter) cell.classList.add("has-point");
+      return cell;
     }
 
     function stepIndexFor(kind, col) {
@@ -1137,6 +1163,7 @@
           const cell = makeCell(kind, String(q.A[item.col]));
           const marks = columnMarks(item.col, revealed);
           if (marks.crossed) cell.classList.add("is-crossed");
+          withPoint(cell, item);
           if (marks.tuck) {
             const tuck = document.createElement("span");
             tuck.className = "tuck";
@@ -1157,7 +1184,7 @@
           board.appendChild(makeCell("", ""));
         } else {
           const kind = q.placeholderB.has(item.col) ? "placeholder" : "digit";
-          board.appendChild(makeCell(kind, String(q.B[item.col])));
+          board.appendChild(withPoint(makeCell(kind, String(q.B[item.col])), item));
         }
       });
 
@@ -1188,7 +1215,7 @@
               cell.addEventListener("click", revealNext);
             }
           }
-          board.appendChild(cell);
+          board.appendChild(withPoint(cell, item));
         }
       });
 

@@ -10,6 +10,3 @@ Small fixes to come back to.
 
 ## Multiplication and Long Division
 - Boxes get small on Chromebooks in a browser window for 2-digit questions. Same option as above.
-
-## All Operations pages
-- Decide whether Addition and Subtraction should use the same decimal point style as Multiplication (dot in the gap, no separate column).
