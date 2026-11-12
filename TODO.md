@@ -2,9 +2,6 @@
 
 Small fixes to come back to.
 
-## Multiplication
-- Decimal point position and size. James will draw where it should sit, using the iPad.
-
 ## Long Division
 - Spacing of the "r" and the remainder in the answer row.
 - Boxes get small on Chromebooks for long questions (Years 6 and 8). Option: make the question box and explanation bar smaller on this page.
