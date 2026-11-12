@@ -553,7 +553,8 @@
       content: "";
       position: absolute;
       --dot: max(4px, calc(var(--cell) * 0.06));
-      right: calc(var(--cell) * -0.07 - var(--dot) / 2);
+      /* Measured from inside the 2px border, so add the border to centre it in the gap */
+      right: calc(var(--cell) * -0.07 - var(--dot) / 2 - 2px);
       bottom: 0;
       width: var(--dot);
       height: var(--dot);
