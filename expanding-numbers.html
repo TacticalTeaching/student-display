@@ -1,0 +1,1189 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Expanded Numbers</title>
+  <style>
+    :root {
+      --ink: #18212f;
+      --muted: #647184;
+      --paper: #f8f8f6;
+      --panel: #ffffff;
+      --line: #d8ddd8;
+      --slate: #c6ccd2;
+      --soft: #eef4f1;
+      --green: #177b63;
+      --green-dark: #0f5949;
+      --green-light: #e8f4ef;
+      --blue: #315f9f;
+      --yellow: #f0c958;
+      --yellow-hover: #e8ba43;
+      --coral: #d96d5c;
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--paper);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      opacity: 0.5;
+      background-image:
+        linear-gradient(rgba(74, 124, 190, 0.28) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74, 124, 190, 0.28) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    a {
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    /* Full-viewport zero-scroll layout for Chromebook (1366x768) & Classroom TV (1920x1080+) */
+    .app {
+      width: min(1680px, 100%);
+      height: 100dvh;
+      max-height: 100dvh;
+      margin: 0 auto;
+      padding: clamp(8px, 1.5vh, 20px) clamp(12px, 1.8vw, 28px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: clamp(8px, 1.4vh, 16px);
+      overflow: hidden;
+    }
+
+    /* Top bar matching Addition Layout Final */
+    .top-bar {
+      display: grid;
+      grid-template-columns: clamp(175px, 15vw, 230px) minmax(0, 1fr) clamp(220px, 21vw, 300px);
+      gap: clamp(10px, 1.2vw, 16px);
+      align-items: stretch;
+    }
+
+    .nav-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-btn {
+      flex: 1;
+      min-height: clamp(38px, 5.5vh, 52px);
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--yellow);
+      color: var(--ink);
+      font-weight: 950;
+      font-size: clamp(0.88rem, 1.1vw, 1.08rem);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: transform 120ms ease, background 120ms ease;
+    }
+
+    .nav-btn:hover,
+    .nav-btn:focus-visible {
+      background: var(--yellow-hover);
+      transform: translateY(-1px);
+      outline: 3px solid rgba(24, 33, 47, 0.18);
+    }
+
+    .title-banner {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--slate);
+      padding: clamp(6px, 1vh, 12px) 16px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+    }
+
+    .title-banner h1 {
+      margin: 0;
+      font-size: clamp(1.2rem, 2.2vw, 1.85rem);
+      font-weight: 950;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+    }
+
+    .year-badge-card {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: 4px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 0;
+      overflow: hidden;
+      container-type: inline-size;
+    }
+
+    .year-badge-label {
+      background: var(--green-light);
+      border: 1.5px solid var(--green);
+      color: var(--green-dark);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: clamp(0.68rem, 4.6cqi, 0.85rem);
+      font-weight: 950;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .year-badge-value {
+      font-size: var(--badge-font-size, clamp(0.72rem, 4.6cqi, 1rem));
+      font-weight: 950;
+      color: var(--ink);
+      white-space: nowrap;
+      min-width: 0;
+    }
+
+    /* Main 3-column workspace */
+    .workspace {
+      display: grid;
+      grid-template-columns: clamp(175px, 15vw, 230px) minmax(0, 1fr) clamp(220px, 21vw, 300px);
+      gap: clamp(10px, 1.2vw, 16px);
+      min-height: 0;
+      align-items: stretch;
+    }
+
+    /* Left Column: Year Selector + Question Controls */
+    .left-col {
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      gap: clamp(8px, 1.2vh, 12px);
+      min-height: 0;
+    }
+
+    .panel-card {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: clamp(8px, 1.2vh, 14px);
+      min-height: 0;
+    }
+
+    .panel-heading {
+      margin: 0 0 clamp(6px, 1vh, 10px);
+      color: var(--muted);
+      font-size: clamp(0.66rem, 0.85vw, 0.78rem);
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .year-panel {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .level-grid {
+      display: grid;
+      grid-template-rows: repeat(6, minmax(0, 1fr));
+      gap: clamp(4px, 0.7vh, 8px);
+      min-height: 0;
+    }
+
+    .level-button {
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--muted);
+      font-weight: 850;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 0 clamp(8px, 1vw, 12px);
+      min-height: 0;
+      transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    }
+
+    .level-button strong {
+      font-size: clamp(0.88rem, 1.15vw, 1.12rem);
+      font-weight: 950;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .level-button span {
+      font-size: clamp(0.68rem, 0.82vw, 0.8rem);
+      font-weight: 800;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .level-button.is-active {
+      background: var(--green-light);
+      border: 2px solid var(--green);
+      color: var(--green-dark);
+      box-shadow: inset 4px 0 0 var(--green);
+    }
+
+    .level-button.is-active strong,
+    .level-button.is-active span {
+      color: var(--green-dark);
+    }
+
+    .level-button:hover,
+    .level-button:focus-visible {
+      border-color: var(--green);
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .actions {
+      display: grid;
+      gap: clamp(6px, 0.9vh, 10px);
+    }
+
+    .action-button {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      min-height: clamp(36px, 5.2vh, 48px);
+      padding: 0 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      background: var(--green);
+      font-weight: 950;
+      font-size: clamp(0.84rem, 1.05vw, 1rem);
+      cursor: pointer;
+      transition: transform 120ms ease, background 120ms ease;
+    }
+
+    .action-button:hover,
+    .action-button:focus-visible {
+      transform: translateY(-1px);
+      background: var(--green-dark);
+      outline: 3px solid rgba(23, 123, 99, 0.22);
+    }
+
+    .action-button.secondary {
+      color: var(--ink);
+      background: var(--yellow);
+    }
+
+    .action-button.secondary:hover,
+    .action-button.secondary:focus-visible {
+      background: var(--yellow-hover);
+      outline-color: rgba(240, 201, 88, 0.35);
+    }
+
+    .action-button.ghost {
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .action-button.ghost:hover,
+    .action-button.ghost:focus-visible {
+      background: var(--soft);
+    }
+
+    /* Center Column: Current Number + Expanded Steps */
+    .center-col {
+      display: grid;
+      grid-template-rows: minmax(110px, 0.34fr) minmax(0, 0.66fr);
+      gap: clamp(8px, 1.4vh, 16px);
+      min-height: 0;
+    }
+
+    .box-b {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(255, 253, 247, 0.98));
+      display: grid;
+      place-items: center;
+      padding: clamp(10px, 2vh, 24px) clamp(14px, 2vw, 28px);
+      position: relative;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .box-b-tag {
+      position: absolute;
+      top: clamp(6px, 1vh, 10px);
+      left: clamp(10px, 1.2vw, 14px);
+      font-size: clamp(0.64rem, 0.8vw, 0.76rem);
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .number-display {
+      max-width: 100%;
+      color: var(--ink);
+      font-family: "Trebuchet MS", Inter, sans-serif;
+      font-size: clamp(2.8rem, min(8.5vw, 13vh), 6.8rem);
+      font-weight: 900;
+      line-height: 0.95;
+      text-align: center;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .number-display.is-long {
+      font-size: clamp(2.3rem, min(6.8vw, 11vh), 5.4rem);
+    }
+
+    .number-display.is-extra-long {
+      font-size: clamp(1.9rem, min(5.6vw, 9.5vh), 4.4rem);
+    }
+
+    .box-d {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: clamp(8px, 1.4vh, 16px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: clamp(6px, 1.1vh, 12px);
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .steps-title {
+      margin: 0;
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius);
+      padding: clamp(6px, 0.9vh, 10px) 14px;
+      background: linear-gradient(90deg, rgba(23, 123, 99, 0.12), transparent), #fbfdfb;
+      color: var(--green-dark);
+      font-size: clamp(0.76rem, 0.95vw, 0.92rem);
+      font-weight: 950;
+      letter-spacing: 0.05em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .steps {
+      display: grid;
+      grid-auto-rows: minmax(0, 1fr);
+      gap: clamp(6px, 1vh, 10px);
+      min-height: 0;
+    }
+
+    .step-row {
+      display: grid;
+      grid-template-columns: clamp(78px, 8vw, 104px) minmax(0, 1fr);
+      gap: clamp(8px, 1vw, 12px);
+      align-items: stretch;
+      min-height: 0;
+    }
+
+    .step-toggle {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      padding: 6px 8px;
+      background: var(--yellow);
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 950;
+      font-size: clamp(0.84rem, 1.05vw, 1.05rem);
+      transition: transform 120ms ease, background 120ms ease;
+    }
+
+    .step-toggle:hover,
+    .step-toggle:focus-visible {
+      background: var(--yellow-hover);
+      transform: translateY(-1px);
+      outline: 3px solid rgba(24, 33, 47, 0.16);
+    }
+
+    .step-toggle.is-revealed {
+      color: #fff;
+      border-color: var(--ink);
+      background: var(--green);
+    }
+
+    .step-toggle.is-revealed:hover,
+    .step-toggle.is-revealed:focus-visible {
+      background: var(--green-dark);
+    }
+
+    .step-output {
+      min-width: 0;
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      padding: 6px clamp(10px, 1.2vw, 16px);
+      display: flex;
+      align-items: center;
+      background: var(--green-light);
+      border-color: var(--green-dark);
+      color: var(--green-dark);
+      font-family: "Trebuchet MS", Inter, sans-serif;
+      font-size: var(--step-font-size, clamp(1.1rem, 1.8vw, 1.55rem));
+      font-weight: 900;
+      line-height: 1.15;
+      word-spacing: 0.08em;
+      white-space: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    .step-output.is-hidden {
+      border-color: #8fa0ad;
+      color: var(--muted);
+      background:
+        repeating-linear-gradient(
+          90deg,
+          #f5f8fb 0,
+          #f5f8fb 16px,
+          #eef3f8 16px,
+          #eef3f8 32px
+        );
+      cursor: pointer;
+    }
+
+    .step-output.is-hidden::before {
+      content: attr(data-prompt);
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      color: var(--muted);
+      font-size: clamp(0.8rem, 1vw, 0.96rem);
+      font-weight: 850;
+      letter-spacing: 0.02em;
+    }
+
+    .step-expr {
+      display: inline-block;
+      white-space: nowrap;
+    }
+
+    .latex-power sup {
+      margin-left: 1px;
+      font-size: 0.7em;
+      line-height: 0;
+      vertical-align: super;
+    }
+
+    .latex-power {
+      display: inline-block;
+      margin: 0 0.04em;
+    }
+
+    .latex-fraction {
+      display: inline-grid;
+      grid-template-rows: auto auto;
+      align-items: center;
+      justify-items: center;
+      min-width: 1.5em;
+      margin: 0 0.14em 0 0.18em;
+      line-height: 1;
+      font-size: 0.9em;
+      vertical-align: middle;
+    }
+
+    .latex-fraction span:first-child {
+      width: 100%;
+      border-bottom: 1.5px solid currentColor;
+      padding: 0 3px 1px;
+      text-align: center;
+    }
+
+    .latex-fraction span:last-child {
+      padding: 1px 3px 0;
+      text-align: center;
+    }
+
+    .step-output.is-small {
+      --step-font-size: clamp(0.95rem, 1.35vw, 1.18rem);
+    }
+
+    .step-output.is-tiny {
+      --step-font-size: clamp(0.8rem, 1.1vw, 0.98rem);
+    }
+
+    .step-output.is-micro {
+      --step-font-size: clamp(0.68rem, 0.95vw, 0.84rem);
+    }
+
+    .step-output.is-fitted {
+      --step-font-size: var(--fit-font-size, 1.35rem);
+    }
+
+    /* Right Column: Helpful Hints */
+    .box-e {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: clamp(8px, 1.2vh, 14px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .box-e .panel-heading {
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius);
+      padding: clamp(6px, 0.9vh, 10px) 10px;
+      background: linear-gradient(90deg, rgba(23, 123, 99, 0.12), transparent), #fbfdfb;
+      color: var(--green-dark);
+      text-align: center;
+      margin-bottom: clamp(6px, 1vh, 10px);
+    }
+
+    .hint-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      align-content: start;
+      gap: clamp(4px, 0.7vh, 7px);
+      overflow-y: auto;
+      min-height: 0;
+      padding-right: 2px;
+    }
+
+    .hint-list li {
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius);
+      padding: 0;
+      overflow: hidden;
+      background: #fff;
+      color: var(--ink);
+      font-size: clamp(0.76rem, 0.9vw, 0.86rem);
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .hint-toggle {
+      width: 100%;
+      min-height: clamp(26px, 3.8vh, 34px);
+      border: 0;
+      padding: 5px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f5f8fb;
+      color: var(--ink);
+      font-size: clamp(0.64rem, 0.78vw, 0.74rem);
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .hint-toggle::after {
+      content: "+";
+      color: var(--blue);
+      font-size: 0.95rem;
+      font-weight: 950;
+    }
+
+    .hint-toggle.is-revealed {
+      background: var(--green-light);
+      color: var(--green-dark);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hint-toggle.is-revealed::after {
+      content: "−";
+      color: var(--green-dark);
+    }
+
+    .hint-toggle:hover,
+    .hint-toggle:focus-visible {
+      background: #e8eff7;
+      outline: none;
+    }
+
+    .hint-body {
+      padding: 6px 10px 8px;
+      background: #fff;
+    }
+
+    .hint-example {
+      display: block;
+      font-family: "Trebuchet MS", Inter, sans-serif;
+      font-size: clamp(0.72rem, 0.85vw, 0.82rem);
+      line-height: 1.35;
+      white-space: nowrap;
+      overflow-x: auto;
+    }
+
+    .hint-number {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--green-dark);
+      font-family: "Trebuchet MS", Inter, sans-serif;
+      font-size: clamp(0.78rem, 0.92vw, 0.88rem);
+      font-weight: 950;
+    }
+
+    .hint-example.is-compact {
+      font-size: clamp(0.62rem, 0.74vw, 0.72rem);
+    }
+
+    .hint-example.is-tight {
+      font-size: clamp(0.54rem, 0.66vw, 0.65rem);
+    }
+
+    .hint-example.is-tight .latex-power,
+    .hint-example.is-tight .latex-fraction {
+      margin: 0 0.03em;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media print {
+      body::before,
+      .left-col,
+      .box-e,
+      .nav-group {
+        display: none;
+      }
+
+      .app {
+        height: auto;
+        max-height: none;
+        overflow: visible;
+        padding: 0;
+      }
+
+      .top-bar,
+      .workspace {
+        display: block;
+      }
+
+      .box-b,
+      .box-d {
+        margin-top: 12px;
+      }
+
+      .step-output.is-hidden::before {
+        content: "";
+      }
+    }
+
+    @media (max-width: 900px) {
+      .app {
+        height: auto;
+        max-height: none;
+        overflow: visible;
+      }
+
+      .top-bar,
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .level-grid {
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: auto;
+      }
+
+      .level-button {
+        min-height: 44px;
+      }
+
+      .actions {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .center-col {
+        grid-template-rows: auto auto;
+      }
+
+      .step-row {
+        min-height: 54px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .level-grid,
+      .actions {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .step-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-bar">
+      <nav class="nav-group" aria-label="Page navigation">
+        <a class="nav-btn" href="?page=home" data-page="home" title="Home">Home</a>
+        <a class="nav-btn" href="?page=number" data-page="number" title="Back">Back</a>
+      </nav>
+      <div class="title-banner">
+        <h1>Expanded Numbers</h1>
+      </div>
+      <div class="year-badge-card" aria-live="polite">
+        <span class="year-badge-label" id="yearBadgeLabel">Year 3</span>
+        <span class="year-badge-value" id="yearBadgeText">3 Digits</span>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <aside class="left-col" aria-label="Choose year and question controls">
+        <div class="panel-card year-panel">
+          <p class="panel-heading">Year</p>
+          <div class="level-grid" id="levelGrid"></div>
+        </div>
+
+        <div class="panel-card">
+          <p class="panel-heading">Controls</p>
+          <div class="actions">
+            <button class="action-button" id="newQuestion" type="button">New Question</button>
+            <button class="action-button secondary" id="revealAll" type="button">Reveal All</button>
+            <button class="action-button ghost" id="hideAll" type="button">Hide Steps</button>
+          </div>
+        </div>
+      </aside>
+
+      <div class="center-col">
+        <section class="box-b" aria-label="Current number">
+          <span class="box-b-tag">Number</span>
+          <div class="number-display" id="numberDisplay"></div>
+        </section>
+
+        <main class="box-d" aria-label="Expanded number steps">
+          <p class="steps-title">Click each step to reveal</p>
+          <div class="steps" id="steps"></div>
+        </main>
+      </div>
+
+      <aside class="box-e" aria-label="Helpful hints and examples">
+        <p class="panel-heading">Helpful hints</p>
+        <ul class="hint-list">
+          <li>
+            <button class="hint-toggle" type="button" aria-expanded="false">Place value</button>
+            <div class="hint-body" hidden>
+              7 in the hundreds place is 700.
+            </div>
+          </li>
+          <li>
+            <button class="hint-toggle" type="button" aria-expanded="false">Powers of 10</button>
+            <div class="hint-body" hidden>
+              1000 = 10 × 10 × 10 = 10<sup>3</sup>.
+            </div>
+          </li>
+          <li>
+            <button class="hint-toggle" type="button" aria-expanded="false">Expanded Form</button>
+            <div class="hint-body" hidden>
+              <span class="hint-number">4,372</span>
+              <span class="hint-example">4,000 + 300 + 70 + 2</span>
+            </div>
+          </li>
+          <li>
+            <button class="hint-toggle" type="button" aria-expanded="false">Expanded Notation</button>
+            <div class="hint-body" hidden>
+              <span class="hint-number">4,372</span>
+              <span class="hint-example">(4 × 1,000) + (3 × 100) + (7 × 10) + (2 × 1)</span>
+            </div>
+          </li>
+          <li>
+            <button class="hint-toggle" type="button" aria-expanded="false">Exponential Expanded Form</button>
+            <div class="hint-body" hidden>
+              <span class="hint-number">4,372</span>
+              <span class="hint-example">(4 × <span class="latex-power">10<sup>3</sup></span>) + (3 × <span class="latex-power">10<sup>2</sup></span>) + (7 × <span class="latex-power">10<sup>1</sup></span>) + (2 × <span class="latex-power">10<sup>0</sup></span>)</span>
+            </div>
+          </li>
+          <li>
+            <button class="hint-toggle" type="button" aria-expanded="false">Decimal Expanded Notation</button>
+            <div class="hint-body" hidden>
+              <span class="hint-number">1.346</span>
+              <span class="hint-example is-compact">(1 × 1) + (3 × 0.1) + (4 × 0.01) + (6 × 0.001)</span>
+            </div>
+          </li>
+          <li>
+            <button class="hint-toggle" type="button" aria-expanded="false">Expanded Form (Dec. Fractions)</button>
+            <div class="hint-body" hidden>
+              <span class="hint-number">1.346</span>
+              <span class="hint-example is-tight">(1 × <span class="latex-power">10<sup>0</sup></span>) + (3 × <span class="latex-fraction" aria-label="\frac{1}{10}"><span>1</span><span>10</span></span>) + (4 × <span class="latex-fraction" aria-label="\frac{1}{100}"><span>1</span><span>100</span></span>) + (6 × <span class="latex-fraction" aria-label="\frac{1}{1000}"><span>1</span><span>1000</span></span>)</span>
+            </div>
+          </li>
+          <li>
+            <button class="hint-toggle" type="button" aria-expanded="false">Negative Exponential Expanded</button>
+            <div class="hint-body" hidden>
+              <span class="hint-number">1.346</span>
+              <span class="hint-example is-tight">(1 × <span class="latex-power">10<sup>0</sup></span>) + (3 × <span class="latex-power">10<sup>-1</sup></span>) + (4 × <span class="latex-power">10<sup>-2</sup></span>) + (6 × <span class="latex-power">10<sup>-3</sup></span>)</span>
+            </div>
+          </li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const levelGrid = document.getElementById("levelGrid");
+    const numberDisplay = document.getElementById("numberDisplay");
+    const stepsElement = document.getElementById("steps");
+    const yearBadgeLabel = document.getElementById("yearBadgeLabel");
+    const yearBadgeText = document.getElementById("yearBadgeText");
+
+    const yearSettings = {
+      3: { year: 3, tag: "3 digits", detail: "3 Digits", min: 100, max: 999, decimals: 0 },
+      4: { year: 4, tag: "4 digits", detail: "4 Digits", min: 1000, max: 9999, decimals: 0 },
+      5: { year: 5, tag: "6 digits", detail: "6 Digits", min: 100000, max: 999999, decimals: 0 },
+      6: { year: 6, tag: "7 digits", detail: "7 Digits", min: 1000000, max: 9999999, decimals: 0 },
+      7: { year: 7, tag: "3d + 3 dec", detail: "3 Digits + Decimals", min: 100, max: 999, decimals: 3 },
+      8: { year: 8, tag: "5d + 3 dec", detail: "5 Digits + Decimals", min: 10000, max: 99999, decimals: 3 }
+    };
+
+    let currentYear = 3;
+    let currentQuestion = null;
+    let revealedSteps = new Set();
+    let previousNumbers = {};
+
+    function randomInteger(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function generateQuestion(year) {
+      const settings = yearSettings[year];
+      let whole = randomInteger(settings.min, settings.max);
+      let decimalDigits = "";
+
+      if (settings.decimals) {
+        decimalDigits = String(randomInteger(1, 999)).padStart(settings.decimals, "0");
+      }
+
+      let raw = decimalDigits ? `${whole}.${decimalDigits}` : String(whole);
+      while (raw === previousNumbers[year]) {
+        whole = randomInteger(settings.min, settings.max);
+        decimalDigits = settings.decimals ? String(randomInteger(1, 999)).padStart(settings.decimals, "0") : "";
+        raw = decimalDigits ? `${whole}.${decimalDigits}` : String(whole);
+      }
+
+      previousNumbers[year] = raw;
+
+      return {
+        raw,
+        wholeDigits: String(whole).split("").map(Number),
+        decimalDigits: decimalDigits ? decimalDigits.split("").map(Number) : []
+      };
+    }
+
+    function formatNumber(question) {
+      const [whole, decimal = ""] = question.raw.split(".");
+      const formattedWhole = Number(whole).toLocaleString("en-NZ");
+      return decimal ? `${formattedWhole}.${decimal}` : formattedWhole;
+    }
+
+    function wholePlaceName(power) {
+      return 10 ** power;
+    }
+
+    function decimalPlaceName(index) {
+      return `0.${"0".repeat(index)}1`;
+    }
+
+    function latexFraction(numerator, denominator) {
+      return `<span class="latex-fraction" aria-label="\\frac{${numerator}}{${denominator}}"><span>${numerator}</span><span>${denominator}</span></span>`;
+    }
+
+    function decimalFraction(index) {
+      return latexFraction(1, 10 ** (index + 1));
+    }
+
+    function latexPower(base, power) {
+      return `<span class="latex-power" aria-label="${base}^{${power}}">${base}<sup>${power}</sup></span>`;
+    }
+
+    function powerTerm(digit, power) {
+      return `(${digit} × ${latexPower(10, power)})`;
+    }
+
+    function expandedValueParts(question) {
+      const wholeLength = question.wholeDigits.length;
+      const parts = [];
+
+      question.wholeDigits.forEach((digit, index) => {
+        if (!digit) return;
+        const power = wholeLength - index - 1;
+        parts.push((digit * wholePlaceName(power)).toLocaleString("en-NZ"));
+      });
+
+      question.decimalDigits.forEach((digit, index) => {
+        if (!digit) return;
+        parts.push(`${decimalPlaceName(index).slice(0, -1)}${digit}`);
+      });
+
+      return parts;
+    }
+
+    function digitTimesPlaceParts(question) {
+      const wholeLength = question.wholeDigits.length;
+      const parts = [];
+
+      question.wholeDigits.forEach((digit, index) => {
+        if (!digit) return;
+        const power = wholeLength - index - 1;
+        const place = wholePlaceName(power).toLocaleString("en-NZ");
+        parts.push(`(${digit} × ${place})`);
+      });
+
+      question.decimalDigits.forEach((digit, index) => {
+        if (!digit) return;
+        parts.push(`(${digit} × ${decimalPlaceName(index)})`);
+      });
+
+      return parts;
+    }
+
+    function positivePowerParts(question) {
+      const wholeLength = question.wholeDigits.length;
+      const parts = [];
+
+      question.wholeDigits.forEach((digit, index) => {
+        if (!digit) return;
+        const power = wholeLength - index - 1;
+        parts.push(powerTerm(digit, power));
+      });
+
+      question.decimalDigits.forEach((digit, index) => {
+        if (!digit) return;
+        parts.push(`(${digit} × ${decimalFraction(index)})`);
+      });
+
+      return parts;
+    }
+
+    function signedPowerParts(question) {
+      const wholeLength = question.wholeDigits.length;
+      const parts = [];
+
+      question.wholeDigits.forEach((digit, index) => {
+        if (!digit) return;
+        const power = wholeLength - index - 1;
+        parts.push(powerTerm(digit, power));
+      });
+
+      question.decimalDigits.forEach((digit, index) => {
+        if (!digit) return;
+        parts.push(powerTerm(digit, `-${index + 1}`));
+      });
+
+      return parts;
+    }
+
+    function stepData() {
+      const hasDecimals = currentYear >= 7;
+      const steps = [
+        { label: "A", title: "Step A", prompt: "Expanded Form", expression: expandedValueParts(currentQuestion).join(" + ") },
+        { label: "B", title: "Step B", prompt: hasDecimals ? "Expanded Notation + Expanded Decimal Notation" : "Expanded Notation", expression: digitTimesPlaceParts(currentQuestion).join(" + ") },
+        { label: "C", title: "Step C", prompt: hasDecimals ? "Exponential Expanded Form & Fractions (Dec. only)" : "Exponential Expanded Form", expression: positivePowerParts(currentQuestion).join(" + ") },
+        { label: "D", title: "Step D", prompt: "Exponential Expanded Form (Positive & Negative)", expression: signedPowerParts(currentQuestion).join(" + ") }
+      ];
+
+      return [5, 7, 8].includes(currentYear) ? steps : steps.filter(step => step.label !== "D");
+    }
+
+    function fitStepOutput(output) {
+      output.classList.remove("is-small", "is-tiny", "is-micro");
+      const length = output.textContent.length;
+
+      if (length > 72) {
+        output.classList.add("is-micro");
+      } else if (length > 54) {
+        output.classList.add("is-tiny");
+      } else if (length > 38) {
+        output.classList.add("is-small");
+      }
+
+      requestAnimationFrame(() => {
+        output.classList.remove("is-fitted");
+        output.style.removeProperty("--fit-font-size");
+
+        if (output.scrollWidth <= output.clientWidth || !output.clientWidth) return;
+
+        const currentSize = Number.parseFloat(getComputedStyle(output).fontSize);
+        const scale = Math.max(0.55, (output.clientWidth - 12) / output.scrollWidth);
+        output.style.setProperty("--fit-font-size", `${currentSize * scale}px`);
+        output.classList.add("is-fitted");
+      });
+    }
+
+    function fitBadge() {
+      const card = yearBadgeText.parentElement;
+      if (!card) return;
+      yearBadgeText.style.removeProperty("--badge-font-size");
+      requestAnimationFrame(() => {
+        const avail = card.clientWidth - yearBadgeLabel.offsetWidth - 28;
+        if (avail > 0 && yearBadgeText.scrollWidth > avail) {
+          const currentSize = Number.parseFloat(getComputedStyle(yearBadgeText).fontSize);
+          const scale = Math.max(0.6, avail / yearBadgeText.scrollWidth);
+          yearBadgeText.style.setProperty("--badge-font-size", `${currentSize * scale}px`);
+        }
+      });
+    }
+
+    function renderLevels() {
+      levelGrid.innerHTML = "";
+
+      Object.values(yearSettings).forEach(item => {
+        const button = document.createElement("button");
+        button.className = "level-button";
+        button.classList.toggle("is-active", item.year === currentYear);
+        button.type = "button";
+        button.dataset.year = item.year;
+        button.innerHTML = `<strong>Year ${item.year}</strong><span>${item.tag}</span>`;
+        button.addEventListener("click", () => {
+          currentYear = item.year;
+          newQuestion();
+        });
+        levelGrid.appendChild(button);
+      });
+
+      yearBadgeLabel.textContent = `Year ${currentYear}`;
+      yearBadgeText.textContent = yearSettings[currentYear].detail;
+      fitBadge();
+    }
+
+    function renderNumber() {
+      const formatted = formatNumber(currentQuestion);
+      numberDisplay.textContent = formatted;
+      numberDisplay.classList.toggle("is-long", formatted.length >= 9);
+      numberDisplay.classList.toggle("is-extra-long", formatted.length >= 11);
+    }
+
+    function toggleStep(label) {
+      if (revealedSteps.has(label)) {
+        revealedSteps.delete(label);
+      } else {
+        revealedSteps.add(label);
+      }
+      renderSteps();
+    }
+
+    function renderSteps() {
+      stepsElement.innerHTML = "";
+
+      stepData().forEach(step => {
+        const row = document.createElement("section");
+        row.className = "step-row";
+
+        const isRevealed = revealedSteps.has(step.label);
+
+        const button = document.createElement("button");
+        button.className = "step-toggle";
+        button.classList.toggle("is-revealed", isRevealed);
+        button.type = "button";
+        button.textContent = step.title || `Step ${step.label}`;
+        button.setAttribute("aria-expanded", isRevealed ? "true" : "false");
+        button.addEventListener("click", () => toggleStep(step.label));
+
+        const output = document.createElement("div");
+        output.className = "step-output";
+        output.dataset.step = step.label;
+        output.dataset.prompt = step.prompt;
+
+        if (isRevealed) {
+          output.innerHTML = `<span class="step-expr">${step.expression}</span>`;
+          fitStepOutput(output);
+        } else {
+          output.classList.add("is-hidden");
+          output.addEventListener("click", () => toggleStep(step.label));
+        }
+
+        row.append(button, output);
+        stepsElement.appendChild(row);
+      });
+    }
+
+    function render() {
+      renderLevels();
+      renderNumber();
+      renderSteps();
+    }
+
+    function newQuestion() {
+      currentQuestion = generateQuestion(currentYear);
+      revealedSteps = new Set();
+      render();
+    }
+
+    document.getElementById("newQuestion").addEventListener("click", newQuestion);
+
+    document.getElementById("revealAll").addEventListener("click", () => {
+      revealedSteps = new Set(stepData().map(step => step.label));
+      renderSteps();
+    });
+
+    document.getElementById("hideAll").addEventListener("click", () => {
+      revealedSteps = new Set();
+      renderSteps();
+    });
+
+    document.querySelectorAll(".hint-toggle").forEach(button => {
+      const body = button.nextElementSibling;
+      button.addEventListener("click", () => {
+        const isRevealed = button.getAttribute("aria-expanded") === "true";
+        button.setAttribute("aria-expanded", isRevealed ? "false" : "true");
+        button.classList.toggle("is-revealed", !isRevealed);
+        body.hidden = isRevealed;
+      });
+    });
+
+    window.addEventListener("resize", () => {
+      fitBadge();
+      document.querySelectorAll(".step-output:not(.is-hidden)").forEach(fitStepOutput);
+    });
+
+    document.querySelectorAll("[data-page]").forEach(link => {
+      link.addEventListener("click", event => {
+        if (window.google && google.script && google.script.run) {
+          event.preventDefault();
+          google.script.run
+            .withSuccessHandler(html => {
+              document.open();
+              document.write(html);
+              document.close();
+            })
+            .loadPage(link.getAttribute("data-page"));
+        }
+      });
+    });
+
+    newQuestion();
+  </script>
+</body>
+</html>
