@@ -188,6 +188,9 @@
             document.write(html);
             document.close();
           })
+          .withFailureHandler(function (error) {
+            alert("Could not open the page \"" + pageKey + "\". Check there is an HTML file with exactly that name in Apps Script, then deploy a new version.\n\n" + (error && error.message ? error.message : error));
+          })
           .loadPage(pageKey);
         return false;
       }
