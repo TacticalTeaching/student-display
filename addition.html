@@ -1028,8 +1028,10 @@
       layout.forEach(item => {
         const slot = document.createElement("div");
         slot.className = item.type === "point" ? "" : "carry-slot";
-        if (item.type === "digit" && q.carryInto[item.col] !== null) {
-          const index = stepIndexFor("carry", item.col);
+        // Carry squares stay hidden until it is their turn
+        const carryIndex = item.type === "digit" && q.carryInto[item.col] !== null ? stepIndexFor("carry", item.col) : -1;
+        if (carryIndex !== -1 && carryIndex <= revealed) {
+          const index = carryIndex;
           const box = document.createElement("button");
           box.type = "button";
           box.className = "carry";
