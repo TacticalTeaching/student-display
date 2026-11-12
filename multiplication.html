@@ -541,15 +541,7 @@
       border-style: dashed;
     }
 
-    /* Rows with a decimal point open a small gap either side of it */
-    .cell.before-point {
-      transform: translateX(calc(var(--cell) * -0.08));
-    }
-
-    .cell.after-point {
-      transform: translateX(calc(var(--cell) * 0.08));
-    }
-
+    /* The decimal point sits in the normal gap between boxes, so every column stays lined up */
     .cell.has-point,
     .cell.point-pending {
       position: relative;
@@ -560,10 +552,11 @@
     .cell.point-pending::after {
       content: "";
       position: absolute;
-      right: calc(var(--cell) * -0.21);
+      --dot: max(5px, calc(var(--cell) * 0.09));
+      right: calc(var(--cell) * -0.07 - var(--dot) / 2);
       bottom: calc(var(--cell) * 0.08);
-      width: calc(var(--cell) * 0.12);
-      height: calc(var(--cell) * 0.12);
+      width: var(--dot);
+      height: var(--dot);
       border-radius: 50%;
       background: var(--ink);
     }
@@ -575,11 +568,10 @@
 
     .cell.point-pending::after {
       background: #f5f8fb;
-      border: 2px solid var(--blue);
-      box-shadow: 0 0 0 3px rgba(49, 95, 159, 0.25);
-      width: calc(var(--cell) * 0.16);
-      height: calc(var(--cell) * 0.16);
-      right: calc(var(--cell) * -0.23);
+      border: 1.5px solid var(--blue);
+      box-shadow: 0 0 0 2px rgba(49, 95, 159, 0.25);
+      --dot: max(9px, calc(var(--cell) * 0.12));
+      box-sizing: border-box;
     }
 
     .carry.is-revealed {
@@ -1124,15 +1116,13 @@
       });
     }
 
-    // Only rows that have a decimal point (the top number, and the answer once placed) open a
-    // small gap for it. Rows without a point stay together.
+    // The point is drawn in the gap after a digit in the top number, and in the answer once placed
     function markPoint(cell, name, col, pointShown, pointNext) {
       const q = question;
       if (q.pointCol === null || !cell) return;
       const isTop = name === "top";
       const isAnswer = name === q.finalRow && (pointShown || pointNext);
       if (!isTop && !isAnswer) return;
-      cell.classList.add(col <= q.pointCol ? "before-point" : "after-point");
       if (col !== q.pointCol) return;
       if (isTop || pointShown) {
         cell.classList.add("has-point");
@@ -1208,7 +1198,7 @@
       const digitRows = order.filter(name => ["top", "mult", "p1", "p2", "ans"].includes(name)).length;
       const carryRows = order.filter(name => ["c1", "c2", "cs"].includes(name)).length;
       const rules = order.filter(name => name === "rule").length;
-      const widthUnits = (question.n + 1) + question.n * 0.14 + (question.pointCol !== null ? 0.16 : 0);
+      const widthUnits = (question.n + 1) + question.n * 0.14 + 0;
       const heightUnits = digitRows + carryRows * 0.42 + rules * 0.07 + (order.length - 1) * 0.14;
       const availableWidth = boardArea.clientWidth * 0.94;
       const availableHeight = boardArea.clientHeight * 0.94;
