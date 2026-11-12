@@ -370,10 +370,57 @@
     }
 
     .board-area {
+      position: relative;
       display: grid;
       place-items: center;
       min-height: 0;
       overflow: hidden;
+    }
+
+    .board-area.is-covered .board {
+      visibility: hidden;
+    }
+
+    /* Cover hides the column layout until students have set it up in their books */
+    .layout-cover {
+      position: absolute;
+      inset: 0;
+      border: 2px dashed #8fa0ad;
+      border-radius: var(--radius);
+      background:
+        repeating-linear-gradient(
+          90deg,
+          #f5f8fb 0,
+          #f5f8fb 16px,
+          #eef3f8 16px,
+          #eef3f8 32px
+        );
+      display: grid;
+      place-content: center;
+      gap: clamp(6px, 1.2vh, 14px);
+      padding: 16px;
+      text-align: center;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 120ms ease, box-shadow 120ms ease;
+    }
+
+    .layout-cover:hover,
+    .layout-cover:focus-visible {
+      border-color: var(--blue);
+      box-shadow: inset 0 0 0 3px rgba(49, 95, 159, 0.18);
+      outline: none;
+    }
+
+    .layout-cover strong {
+      color: var(--ink);
+      font-size: clamp(1.1rem, 2vw, 1.8rem);
+      font-weight: 950;
+    }
+
+    .layout-cover span {
+      font-size: clamp(0.85rem, 1.2vw, 1.1rem);
+      font-weight: 850;
     }
 
     .board {
@@ -671,7 +718,7 @@
             <button class="action-button" id="newQuestion" type="button">New Question</button>
             <button class="action-button secondary" id="revealNext" type="button">Reveal Next</button>
             <button class="action-button ghost" id="revealAll" type="button">Reveal All</button>
-            <button class="action-button ghost" id="hideAll" type="button">Hide Answer</button>
+            <button class="action-button ghost" id="hideAll" type="button">Cover Workout</button>
           </div>
         </div>
       </aside>
@@ -683,9 +730,13 @@
         </section>
 
         <main class="workout-box" aria-label="Column addition workout">
-          <p class="workout-title">Click the highlighted box to reveal each step</p>
-          <div class="board-area" id="boardArea">
+          <p class="workout-title" id="workoutTitle">Write the question in columns</p>
+          <div class="board-area is-covered" id="boardArea">
             <div class="board" id="board"></div>
+            <button class="layout-cover" id="layoutCover" type="button">
+              <strong>Set it up in your book</strong>
+              <span>Click here to check your layout</span>
+            </button>
           </div>
           <p class="step-text is-prompt" id="stepText" aria-live="polite"></p>
         </main>
@@ -752,6 +803,8 @@
     const boardArea = document.getElementById("boardArea");
     const board = document.getElementById("board");
     const stepText = document.getElementById("stepText");
+    const layoutCover = document.getElementById("layoutCover");
+    const workoutTitle = document.getElementById("workoutTitle");
     const yearBadgeLabel = document.getElementById("yearBadgeLabel");
     const yearBadgeText = document.getElementById("yearBadgeText");
 
@@ -773,6 +826,7 @@
     let currentYear = 3;
     let question = null;
     let revealed = 0;
+    let covered = true;
     let previous = {};
 
     function randomInteger(min, max) {
@@ -1060,7 +1114,10 @@
     }
 
     function renderStepText() {
-      if (revealed === 0) {
+      if (covered) {
+        stepText.textContent = "Line up the place values in your book, then check your layout.";
+        stepText.classList.add("is-prompt");
+      } else if (revealed === 0) {
         stepText.textContent = startPrompt();
         stepText.classList.add("is-prompt");
       } else if (revealed >= question.steps.length) {
@@ -1073,6 +1130,9 @@
     }
 
     function renderWorkout() {
+      boardArea.classList.toggle("is-covered", covered);
+      layoutCover.hidden = !covered;
+      workoutTitle.textContent = covered ? "Write the question in columns" : "Click the highlighted box to reveal each step";
       renderBoard();
       renderStepText();
       fitBoard();
@@ -1084,8 +1144,15 @@
       renderWorkout();
     }
 
+    function uncover() {
+      covered = false;
+      renderWorkout();
+    }
+
     function revealNext() {
-      if (revealed < question.steps.length) {
+      if (covered) {
+        uncover();
+      } else if (revealed < question.steps.length) {
         revealed += 1;
         renderWorkout();
       }
@@ -1094,18 +1161,23 @@
     function newQuestion() {
       question = generateQuestion(currentYear);
       revealed = 0;
+      covered = true;
       render();
     }
 
     document.getElementById("newQuestion").addEventListener("click", newQuestion);
     document.getElementById("revealNext").addEventListener("click", revealNext);
 
+    layoutCover.addEventListener("click", uncover);
+
     document.getElementById("revealAll").addEventListener("click", () => {
+      covered = false;
       revealed = question.steps.length;
       renderWorkout();
     });
 
     document.getElementById("hideAll").addEventListener("click", () => {
+      covered = true;
       revealed = 0;
       renderWorkout();
     });
