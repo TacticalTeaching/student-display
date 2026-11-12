@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Operations</title>
+  <style>
+    :root {
+      --ink: #18212f;
+      --muted: #647184;
+      --paper: #f8f8f6;
+      --panel: #ffffff;
+      --slate: #c6ccd2;
+      --green: #177b63;
+      --green-dark: #0f5949;
+      --green-light: #e8f4ef;
+      --yellow: #f0c958;
+      --yellow-hover: #e8ba43;
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--paper);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      opacity: 0.5;
+      background-image:
+        linear-gradient(rgba(74, 124, 190, 0.28) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74, 124, 190, 0.28) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+    }
+
+    .app {
+      width: min(1400px, 100%);
+      height: 100dvh;
+      max-height: 100dvh;
+      margin: 0 auto;
+      padding: clamp(12px, 2.2vh, 28px) clamp(14px, 2vw, 32px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: clamp(16px, 3vh, 32px);
+      overflow: hidden;
+    }
+
+    .top-bar {
+      display: grid;
+      grid-template-columns: clamp(175px, 15vw, 230px) minmax(0, 1fr) clamp(175px, 15vw, 230px);
+      gap: clamp(10px, 1.2vw, 16px);
+      align-items: stretch;
+    }
+
+    .nav-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-btn {
+      flex: 1;
+      min-height: clamp(38px, 5.5vh, 52px);
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--yellow);
+      color: var(--ink);
+      font-weight: 950;
+      font-size: clamp(0.88rem, 1.1vw, 1.08rem);
+      display: grid;
+      place-items: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 120ms ease, background 120ms ease;
+    }
+
+    .nav-btn:hover,
+    .nav-btn:focus-visible {
+      background: var(--yellow-hover);
+      transform: translateY(-1px);
+      outline: 3px solid rgba(24, 33, 47, 0.18);
+    }
+
+    .title-banner {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--slate);
+      padding: clamp(8px, 1.2vh, 14px) 16px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+    }
+
+    .title-banner h1 {
+      margin: 0;
+      font-size: clamp(1.3rem, 2.4vw, 2rem);
+      font-weight: 950;
+      line-height: 1.05;
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 320px));
+      gap: clamp(14px, 2vw, 22px);
+      align-content: start;
+    }
+
+    .tool-card {
+      border: 2px solid var(--ink);
+      border-radius: 14px;
+      background: #ffffff;
+      min-height: clamp(72px, 12vh, 104px);
+      padding: 16px 20px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      text-decoration: none;
+      color: var(--ink);
+      font-size: clamp(1.2rem, 1.8vw, 1.5rem);
+      font-weight: 950;
+      cursor: pointer;
+      transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
+    }
+
+    .tool-card:hover,
+    .tool-card:focus-visible {
+      transform: translateY(-1px);
+      background: var(--green-light);
+      border-color: var(--green-dark);
+      color: var(--green-dark);
+      outline: none;
+    }
+
+    /* Inactive tools at 10% opacity until working */
+    .tool-card.is-inactive {
+      opacity: 0.1;
+      pointer-events: none;
+      user-select: none;
+      cursor: default;
+    }
+
+    @media (max-width: 900px) {
+      .app {
+        height: auto;
+        max-height: none;
+        overflow: visible;
+      }
+
+      .top-bar {
+        grid-template-columns: 1fr;
+      }
+
+      .tool-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-bar">
+      <nav class="nav-group" aria-label="Page navigation">
+        <a class="nav-btn" href="?page=home" data-page="home" title="Home">Home</a>
+        <a class="nav-btn" href="?page=home" data-page="home" title="Back">Back</a>
+      </nav>
+      <div class="title-banner">
+        <h1>Operations</h1>
+      </div>
+      <div></div>
+    </header>
+
+    <main class="tool-grid" aria-label="Operations tools">
+      <a class="tool-card" href="?page=addition" data-page="addition">Addition</a>
+      <div class="tool-card is-inactive" aria-disabled="true">Subtraction</div>
+      <div class="tool-card is-inactive" aria-disabled="true">Multiplication</div>
+      <div class="tool-card is-inactive" aria-disabled="true">Long Division</div>
+    </main>
+  </div>
+
+  <script>
+    function navigateTo(pageKey, fallbackHref) {
+      if (window.google && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(function (html) {
+            document.open();
+            document.write(html);
+            document.close();
+          })
+          .loadPage(pageKey);
+        return false;
+      }
+      if (fallbackHref) {
+        window.location.href = fallbackHref;
+      }
+      return false;
+    }
+
+    document.querySelectorAll("[data-page]").forEach(function (link) {
+      link.addEventListener("click", function (event) {
+        event.preventDefault();
+        navigateTo(link.getAttribute("data-page"), link.getAttribute("href"));
+      });
+    });
+  </script>
+</body>
+</html>

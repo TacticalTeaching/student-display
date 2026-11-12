@@ -1,0 +1,1144 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Addition</title>
+  <style>
+    :root {
+      --ink: #18212f;
+      --muted: #647184;
+      --paper: #f8f8f6;
+      --panel: #ffffff;
+      --line: #d8ddd8;
+      --slate: #c6ccd2;
+      --soft: #eef4f1;
+      --green: #177b63;
+      --green-dark: #0f5949;
+      --green-light: #e8f4ef;
+      --blue: #315f9f;
+      --yellow: #f0c958;
+      --yellow-hover: #e8ba43;
+      --coral: #d96d5c;
+      --coral-light: #fff1ed;
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--paper);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      opacity: 0.5;
+      background-image:
+        linear-gradient(rgba(74, 124, 190, 0.28) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74, 124, 190, 0.28) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    a {
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    /* Full-viewport zero-scroll layout for Chromebook (1366x768) & Classroom TV (1920x1080+) */
+    .app {
+      width: min(1680px, 100%);
+      height: 100dvh;
+      max-height: 100dvh;
+      margin: 0 auto;
+      padding: clamp(8px, 1.5vh, 20px) clamp(12px, 1.8vw, 28px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: clamp(8px, 1.4vh, 16px);
+      overflow: hidden;
+    }
+
+    .top-bar,
+    .workspace {
+      display: grid;
+      grid-template-columns: clamp(175px, 15vw, 230px) minmax(0, 1fr) clamp(220px, 21vw, 300px);
+      gap: clamp(10px, 1.2vw, 16px);
+      align-items: stretch;
+    }
+
+    .workspace {
+      min-height: 0;
+    }
+
+    .nav-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-btn {
+      flex: 1;
+      min-height: clamp(38px, 5.5vh, 52px);
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--yellow);
+      color: var(--ink);
+      font-weight: 950;
+      font-size: clamp(0.88rem, 1.1vw, 1.08rem);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: transform 120ms ease, background 120ms ease;
+    }
+
+    .nav-btn:hover,
+    .nav-btn:focus-visible {
+      background: var(--yellow-hover);
+      transform: translateY(-1px);
+      outline: 3px solid rgba(24, 33, 47, 0.18);
+    }
+
+    .title-banner {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--slate);
+      padding: clamp(6px, 1vh, 12px) 16px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+    }
+
+    .title-banner h1 {
+      margin: 0;
+      font-size: clamp(1.2rem, 2.2vw, 1.85rem);
+      font-weight: 950;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+    }
+
+    .year-badge-card {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: 4px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .year-badge-label {
+      background: var(--green-light);
+      border: 1.5px solid var(--green);
+      color: var(--green-dark);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: clamp(0.68rem, 0.9vw, 0.85rem);
+      font-weight: 950;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .year-badge-value {
+      font-size: clamp(0.72rem, 0.95vw, 1rem);
+      font-weight: 950;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Left column: year selector + controls */
+    .left-col {
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      gap: clamp(8px, 1.2vh, 12px);
+      min-height: 0;
+    }
+
+    .panel-card {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: clamp(8px, 1.2vh, 14px);
+      min-height: 0;
+    }
+
+    .panel-heading {
+      margin: 0 0 clamp(6px, 1vh, 10px);
+      color: var(--muted);
+      font-size: clamp(0.66rem, 0.85vw, 0.78rem);
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .year-panel {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .level-grid {
+      display: grid;
+      grid-template-rows: repeat(6, minmax(0, 1fr));
+      gap: clamp(4px, 0.7vh, 8px);
+      min-height: 0;
+    }
+
+    .level-button {
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--muted);
+      font-weight: 850;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 0 clamp(8px, 1vw, 12px);
+      min-height: 0;
+      transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    }
+
+    .level-button strong {
+      font-size: clamp(0.88rem, 1.15vw, 1.12rem);
+      font-weight: 950;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .level-button span {
+      font-size: clamp(0.68rem, 0.82vw, 0.8rem);
+      font-weight: 800;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .level-button.is-active {
+      background: var(--green-light);
+      border: 2px solid var(--green);
+      box-shadow: inset 4px 0 0 var(--green);
+    }
+
+    .level-button.is-active strong,
+    .level-button.is-active span {
+      color: var(--green-dark);
+    }
+
+    .level-button:hover,
+    .level-button:focus-visible {
+      border-color: var(--green);
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .actions {
+      display: grid;
+      gap: clamp(6px, 0.9vh, 10px);
+    }
+
+    .action-button {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      min-height: clamp(34px, 5vh, 48px);
+      padding: 0 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      background: var(--green);
+      font-weight: 950;
+      font-size: clamp(0.84rem, 1.05vw, 1rem);
+      cursor: pointer;
+      transition: transform 120ms ease, background 120ms ease;
+    }
+
+    .action-button:hover,
+    .action-button:focus-visible {
+      transform: translateY(-1px);
+      background: var(--green-dark);
+      outline: 3px solid rgba(23, 123, 99, 0.22);
+    }
+
+    .action-button.secondary {
+      color: var(--ink);
+      background: var(--yellow);
+    }
+
+    .action-button.secondary:hover,
+    .action-button.secondary:focus-visible {
+      background: var(--yellow-hover);
+      outline-color: rgba(240, 201, 88, 0.35);
+    }
+
+    .action-button.ghost {
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .action-button.ghost:hover,
+    .action-button.ghost:focus-visible {
+      background: var(--soft);
+    }
+
+    /* Centre column: question + column workout */
+    .center-col {
+      display: grid;
+      grid-template-rows: minmax(70px, 0.2fr) minmax(0, 0.8fr);
+      gap: clamp(8px, 1.4vh, 16px);
+      min-height: 0;
+    }
+
+    .question-box {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(255, 253, 247, 0.98));
+      display: grid;
+      place-items: center;
+      padding: clamp(8px, 1.4vh, 16px) clamp(14px, 2vw, 28px);
+      position: relative;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .box-tag {
+      position: absolute;
+      top: clamp(6px, 1vh, 10px);
+      left: clamp(10px, 1.2vw, 14px);
+      font-size: clamp(0.64rem, 0.8vw, 0.76rem);
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .question-display {
+      font-family: "Trebuchet MS", Inter, sans-serif;
+      font-size: clamp(2rem, min(5.4vw, 8vh), 4.6rem);
+      font-weight: 900;
+      line-height: 1;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .workout-box {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: clamp(8px, 1.4vh, 16px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: clamp(6px, 1.1vh, 12px);
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .workout-title {
+      margin: 0;
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius);
+      padding: clamp(6px, 0.9vh, 10px) 14px;
+      background: linear-gradient(90deg, rgba(23, 123, 99, 0.12), transparent), #fbfdfb;
+      color: var(--green-dark);
+      font-size: clamp(0.76rem, 0.95vw, 0.92rem);
+      font-weight: 950;
+      letter-spacing: 0.05em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .board-area {
+      display: grid;
+      place-items: center;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .board {
+      --cell: 56px;
+      display: grid;
+      gap: calc(var(--cell) * 0.14);
+      justify-content: center;
+      align-content: center;
+    }
+
+    .cell {
+      width: var(--cell);
+      height: var(--cell);
+      display: grid;
+      place-items: center;
+      font-family: "Trebuchet MS", Inter, sans-serif;
+      font-size: calc(var(--cell) * 0.56);
+      font-weight: 900;
+      line-height: 1;
+      padding: 0;
+    }
+
+    .cell.digit {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .cell.placeholder {
+      border: 2px dashed #9cacb7;
+      border-radius: var(--radius);
+      background: #fff;
+      color: #9cacb7;
+    }
+
+    .cell.op {
+      color: var(--green-dark);
+      font-size: calc(var(--cell) * 0.6);
+    }
+
+    .cell.point {
+      width: calc(var(--cell) * 0.4);
+      align-items: end;
+      padding-bottom: calc(var(--cell) * 0.08);
+      color: var(--ink);
+      font-size: calc(var(--cell) * 0.7);
+    }
+
+    .cell.answer {
+      border: 2px solid #8fa0ad;
+      border-radius: var(--radius);
+      background: #f5f8fb;
+      color: #9da8b4;
+      font-size: calc(var(--cell) * 0.44);
+      opacity: 0.62;
+    }
+
+    .cell.answer.is-next,
+    .carry.is-next {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(49, 95, 159, 0.22);
+      color: var(--blue);
+      cursor: pointer;
+      opacity: 1;
+    }
+
+    .cell.answer.is-revealed {
+      border-color: var(--green-dark);
+      background: var(--green-light);
+      color: var(--green-dark);
+      font-size: calc(var(--cell) * 0.56);
+      opacity: 1;
+    }
+
+    .carry-slot {
+      width: var(--cell);
+      height: calc(var(--cell) * 0.6);
+      display: grid;
+      place-items: center;
+    }
+
+    .carry {
+      width: calc(var(--cell) * 0.55);
+      height: calc(var(--cell) * 0.55);
+      border: 1.5px dashed #9cacb7;
+      border-radius: 6px;
+      background: #f9fbfd;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      font-family: "Trebuchet MS", Inter, sans-serif;
+      font-size: calc(var(--cell) * 0.34);
+      font-weight: 900;
+      color: #9da8b4;
+      opacity: 0.62;
+    }
+
+    .carry.is-revealed {
+      border: 1.5px solid var(--coral);
+      background: var(--coral-light);
+      color: var(--coral);
+      opacity: 1;
+    }
+
+    .rule {
+      grid-column: 1 / -1;
+      height: calc(var(--cell) * 0.07);
+      min-height: 3px;
+      border-radius: 999px;
+      background: var(--ink);
+    }
+
+    .rule.final {
+      background: var(--green-dark);
+    }
+
+    .step-text {
+      margin: 0;
+      min-height: clamp(38px, 6vh, 56px);
+      border: 2px solid var(--green-dark);
+      border-radius: var(--radius);
+      padding: 6px clamp(10px, 1.2vw, 16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: var(--green-light);
+      color: var(--green-dark);
+      font-size: clamp(0.95rem, 1.45vw, 1.35rem);
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    .step-text.is-prompt {
+      border-color: #8fa0ad;
+      background: #f5f8fb;
+      color: var(--muted);
+    }
+
+    /* Right column: helpful hints */
+    .box-e {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: clamp(8px, 1.2vh, 14px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .box-e .panel-heading {
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius);
+      padding: clamp(6px, 0.9vh, 10px) 10px;
+      background: linear-gradient(90deg, rgba(23, 123, 99, 0.12), transparent), #fbfdfb;
+      color: var(--green-dark);
+      text-align: center;
+      margin-bottom: clamp(6px, 1vh, 10px);
+    }
+
+    .hint-list {
+      margin: 0;
+      padding: 0 2px 0 0;
+      list-style: none;
+      display: grid;
+      align-content: start;
+      grid-auto-rows: max-content;
+      gap: clamp(4px, 0.7vh, 7px);
+      overflow-y: auto;
+      min-height: 0;
+    }
+
+    .hint-list li {
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #fff;
+      font-size: clamp(0.76rem, 0.9vw, 0.86rem);
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .hint-toggle {
+      width: 100%;
+      min-height: clamp(26px, 3.8vh, 34px);
+      border: 0;
+      padding: 5px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f5f8fb;
+      color: var(--ink);
+      font-size: clamp(0.64rem, 0.78vw, 0.74rem);
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .hint-toggle::after {
+      content: "+";
+      color: var(--blue);
+      font-size: 0.95rem;
+      font-weight: 950;
+    }
+
+    .hint-toggle.is-revealed {
+      background: var(--green-light);
+      color: var(--green-dark);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hint-toggle.is-revealed::after {
+      content: "−";
+      color: var(--green-dark);
+    }
+
+    .hint-toggle:hover,
+    .hint-toggle:focus-visible {
+      background: #e8eff7;
+      outline: none;
+    }
+
+    .hint-body {
+      padding: 6px 10px 8px;
+    }
+
+    .hint-example {
+      display: block;
+      margin-top: 2px;
+      color: var(--green-dark);
+      font-family: "Trebuchet MS", Inter, sans-serif;
+      font-weight: 950;
+    }
+
+    @media (max-width: 900px) {
+      .app {
+        height: auto;
+        max-height: none;
+        overflow: visible;
+      }
+
+      .top-bar,
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .level-grid {
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: auto;
+      }
+
+      .level-button {
+        min-height: 44px;
+      }
+
+      .actions {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .center-col {
+        grid-template-rows: auto minmax(360px, auto);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-bar">
+      <nav class="nav-group" aria-label="Page navigation">
+        <a class="nav-btn" href="?page=home" data-page="home" title="Home">Home</a>
+        <a class="nav-btn" href="?page=operations" data-page="operations" title="Back">Back</a>
+      </nav>
+      <div class="title-banner">
+        <h1>Addition</h1>
+      </div>
+      <div class="year-badge-card" aria-live="polite">
+        <span class="year-badge-label" id="yearBadgeLabel">Year 3</span>
+        <span class="year-badge-value" id="yearBadgeText">2 Digits + 2 Digits</span>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <aside class="left-col" aria-label="Choose year and question controls">
+        <div class="panel-card year-panel">
+          <p class="panel-heading">Year</p>
+          <div class="level-grid" id="levelGrid"></div>
+        </div>
+
+        <div class="panel-card">
+          <p class="panel-heading">Controls</p>
+          <div class="actions">
+            <button class="action-button" id="newQuestion" type="button">New Question</button>
+            <button class="action-button secondary" id="revealNext" type="button">Reveal Next</button>
+            <button class="action-button ghost" id="revealAll" type="button">Reveal All</button>
+            <button class="action-button ghost" id="hideAll" type="button">Hide Answer</button>
+          </div>
+        </div>
+      </aside>
+
+      <div class="center-col">
+        <section class="question-box" aria-label="Current question">
+          <span class="box-tag">Question</span>
+          <div class="question-display" id="questionDisplay"></div>
+        </section>
+
+        <main class="workout-box" aria-label="Column addition workout">
+          <p class="workout-title">Click the highlighted box to reveal each step</p>
+          <div class="board-area" id="boardArea">
+            <div class="board" id="board"></div>
+          </div>
+          <p class="step-text is-prompt" id="stepText" aria-live="polite"></p>
+        </main>
+      </div>
+
+      <aside class="box-e" aria-label="Helpful hints and examples">
+        <p class="panel-heading">Helpful hints</p>
+        <ul class="hint-list">
+          <li>
+            <button class="hint-toggle" type="button" aria-expanded="false">Line up place value</button>
+            <div class="hint-body" hidden>
+              Ones under ones, tens under tens, hundreds under hundreds.
+            </div>
+          </li>
+          <li>
+            <button class="hint-toggle" type="button" aria-expanded="false">Start on the right</button>
+            <div class="hint-body" hidden>
+              Add the ones first, then move left one column at a time.
+            </div>
+          </li>
+          <li>
+            <button class="hint-toggle" type="button" aria-expanded="false">Carrying (regrouping)</button>
+            <div class="hint-body" hidden>
+              If a column makes 10 or more, write the ones digit and carry the ten to the next column.
+              <span class="hint-example">8 + 7 = 15 → write 5, carry 1</span>
+            </div>
+          </li>
+          <li>
+            <button class="hint-toggle" type="button" aria-expanded="false">Add the carry</button>
+            <div class="hint-body" hidden>
+              Remember to add the carried number into the next column.
+              <span class="hint-example">1 + 5 + 4 = 10</span>
+            </div>
+          </li>
+          <li>
+            <button class="hint-toggle" type="button" aria-expanded="false">Line up decimal points</button>
+            <div class="hint-body" hidden>
+              Line up the decimal points. The point drops straight down into the answer.
+              <span class="hint-example">34.6 + 7.25 → 34.60 + 7.25</span>
+            </div>
+          </li>
+          <li>
+            <button class="hint-toggle" type="button" aria-expanded="false">Placeholder zeros</button>
+            <div class="hint-body" hidden>
+              Adding a zero to the end of a decimal does not change its value.
+              <span class="hint-example">34.6 = 34.60</span>
+            </div>
+          </li>
+          <li>
+            <button class="hint-toggle" type="button" aria-expanded="false">Check with an estimate</button>
+            <div class="hint-body" hidden>
+              Round each number first to check your answer makes sense.
+              <span class="hint-example">358 + 247 ≈ 360 + 250 = 610</span>
+            </div>
+          </li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const levelGrid = document.getElementById("levelGrid");
+    const questionDisplay = document.getElementById("questionDisplay");
+    const boardArea = document.getElementById("boardArea");
+    const board = document.getElementById("board");
+    const stepText = document.getElementById("stepText");
+    const yearBadgeLabel = document.getElementById("yearBadgeLabel");
+    const yearBadgeText = document.getElementById("yearBadgeText");
+
+    // whole = number of whole-number digits, dp = decimal places
+    const yearSettings = {
+      3: { year: 3, tag: "2d + 2d", detail: "2 Digits + 2 Digits", a: { whole: 2, dp: 0 }, b: { whole: 2, dp: 0 } },
+      4: { year: 4, tag: "3d + 2d", detail: "3 Digits + 2 Digits", a: { whole: 3, dp: 0 }, b: { whole: 2, dp: 0 } },
+      5: { year: 5, tag: "3d + 3d", detail: "3 Digits + 3 Digits", a: { whole: 3, dp: 0 }, b: { whole: 3, dp: 0 } },
+      6: { year: 6, tag: "4d + 3d", detail: "4 Digits + 3 Digits", a: { whole: 4, dp: 0 }, b: { whole: 3, dp: 0 } },
+      7: { year: 7, tag: "2 dec. places", detail: "Decimals (2 d.p.)", a: { whole: 2, dp: 2 }, b: { whole: 2, dp: 2 } },
+      8: { year: 8, tag: "mixed decimals", detail: "Mixed Decimals", a: { whole: 3, dp: 1 }, b: { whole: 2, dp: 2 } }
+    };
+
+    const WHOLE_PLACES = ["ones", "tens", "hundreds", "thousands", "ten thousands", "hundred thousands"];
+    const WHOLE_SINGLE = ["one", "ten", "hundred", "thousand", "ten thousand", "hundred thousand"];
+    const DEC_PLACES = ["tenths", "hundredths", "thousandths"];
+    const DEC_SINGLE = ["tenth", "hundredth", "thousandth"];
+
+    let currentYear = 3;
+    let question = null;
+    let revealed = 0;
+    let previous = {};
+
+    function randomInteger(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // A number is stored as an integer count of its smallest place (e.g. 34.67 -> 3467, dp 2)
+    function makeNumber(spec) {
+      const min = 10 ** (spec.whole - 1) * 10 ** spec.dp;
+      const max = 10 ** spec.whole * 10 ** spec.dp - 1;
+      let value = randomInteger(min, max);
+      while (spec.dp > 0 && value % 10 === 0) {
+        value = randomInteger(min, max);
+      }
+      return value;
+    }
+
+    function needsCarry(a, b) {
+      let carry = 0;
+      while (a > 0 || b > 0) {
+        const total = (a % 10) + (b % 10) + carry;
+        if (total >= 10) return true;
+        carry = Math.floor(total / 10);
+        a = Math.floor(a / 10);
+        b = Math.floor(b / 10);
+      }
+      return false;
+    }
+
+    function formatValue(value, dp) {
+      if (!dp) return String(value);
+      const text = String(value).padStart(dp + 1, "0");
+      return `${text.slice(0, -dp)}.${text.slice(-dp)}`;
+    }
+
+    function generateQuestion(year) {
+      const settings = yearSettings[year];
+      const dp = Math.max(settings.a.dp, settings.b.dp);
+      const wantCarry = Math.random() < 0.9;
+      let a, b, key;
+
+      for (let i = 0; i < 80; i++) {
+        a = makeNumber(settings.a);
+        b = makeNumber(settings.b);
+        const scaledA = a * 10 ** (dp - settings.a.dp);
+        const scaledB = b * 10 ** (dp - settings.b.dp);
+        key = `${a}+${b}`;
+        if (needsCarry(scaledA, scaledB) === wantCarry && key !== previous[year]) break;
+      }
+
+      previous[year] = key;
+      return buildWorkout(a, settings.a.dp, b, settings.b.dp);
+    }
+
+    function buildWorkout(a, dpA, b, dpB) {
+      const dp = Math.max(dpA, dpB);
+      const scaledA = a * 10 ** (dp - dpA);
+      const scaledB = b * 10 ** (dp - dpB);
+      const sum = scaledA + scaledB;
+
+      const toDigits = value => String(value).padStart(dp + 1, "0").split("").map(Number);
+      const digitsA = toDigits(scaledA);
+      const digitsB = toDigits(scaledB);
+      const digitsSum = toDigits(sum);
+      const columns = Math.max(digitsA.length, digitsB.length, digitsSum.length);
+      const pad = list => Array(columns - list.length).fill(null).concat(list);
+
+      const A = pad(digitsA);
+      const B = pad(digitsB);
+      const S = pad(digitsSum);
+
+      // Placeholder zeros added to the end of the number with fewer decimal places
+      const placeholderA = new Set();
+      const placeholderB = new Set();
+      for (let k = 0; k < dp - dpA; k++) placeholderA.add(columns - 1 - k);
+      for (let k = 0; k < dp - dpB; k++) placeholderB.add(columns - 1 - k);
+
+      // carryInto[i] = carry written above column i (coming from column i + 1)
+      const carryInto = Array(columns).fill(null);
+      const totals = Array(columns).fill(0);
+      let carry = 0;
+      for (let i = columns - 1; i >= 0; i--) {
+        const total = (A[i] ?? 0) + (B[i] ?? 0) + carry;
+        totals[i] = total;
+        carry = Math.floor(total / 10);
+        if (carry && i > 0) carryInto[i - 1] = carry;
+      }
+
+      const steps = [];
+      for (let i = columns - 1; i >= 0; i--) {
+        if (S[i] !== null) steps.push({ kind: "answer", col: i });
+        if (i > 0 && carryInto[i - 1] !== null) steps.push({ kind: "carry", col: i - 1, from: i });
+      }
+
+      return {
+        text: `${formatValue(a, dpA)} + ${formatValue(b, dpB)}`,
+        answerText: formatValue(sum, dp),
+        dp, columns, A, B, S, placeholderA, placeholderB, carryInto, totals, steps
+      };
+    }
+
+    function placeIndex(col) {
+      return question.columns - 1 - col - question.dp;
+    }
+
+    function placeName(col, single) {
+      const p = placeIndex(col);
+      if (p >= 0) return (single ? WHOLE_SINGLE : WHOLE_PLACES)[p];
+      return (single ? DEC_SINGLE : DEC_PLACES)[-p - 1];
+    }
+
+    function capitalise(text) {
+      return text.charAt(0).toUpperCase() + text.slice(1);
+    }
+
+    function countOf(n, col) {
+      return `${n} ${n === 1 ? placeName(col, true) : placeName(col, false)}`;
+    }
+
+    function explain(step) {
+      const q = question;
+      if (step.kind === "answer") {
+        const i = step.col;
+        const place = capitalise(placeName(i, false));
+        const carryIn = q.carryInto[i];
+        const parts = [];
+        if (carryIn) parts.push(`${carryIn} (carried)`);
+        if (q.A[i] !== null) parts.push(String(q.A[i]));
+        if (q.B[i] !== null) parts.push(String(q.B[i]));
+
+        if (q.A[i] === null && q.B[i] === null) {
+          return `${place}: bring down the carried ${carryIn}. Write ${q.S[i]}.`;
+        }
+        if (parts.length === 1) {
+          return `${place}: nothing to add, so bring down the ${parts[0]}.`;
+        }
+        return `${place}: ${parts.join(" + ")} = ${q.totals[i]}. Write ${q.S[i]} in the ${placeName(i, false)}.`;
+      }
+
+      const from = step.from;
+      const total = q.totals[from];
+      return `${countOf(total, from)} = 1 ${placeName(step.col, true)} + ${countOf(total % 10, from)}. Carry 1 to the ${placeName(step.col, false)}.`;
+    }
+
+    function startPrompt() {
+      const rightCol = question.columns - 1;
+      return `Start with the ${placeName(rightCol, false)} column on the right. Click the highlighted box.`;
+    }
+
+    function renderLevels() {
+      levelGrid.innerHTML = "";
+      Object.values(yearSettings).forEach(item => {
+        const button = document.createElement("button");
+        button.className = "level-button";
+        button.classList.toggle("is-active", item.year === currentYear);
+        button.type = "button";
+        button.innerHTML = `<strong>Year ${item.year}</strong><span>${item.tag}</span>`;
+        button.addEventListener("click", () => {
+          currentYear = item.year;
+          newQuestion();
+        });
+        levelGrid.appendChild(button);
+      });
+
+      yearBadgeLabel.textContent = `Year ${currentYear}`;
+      yearBadgeText.textContent = yearSettings[currentYear].detail;
+    }
+
+    // Column layout: operator column, then digit columns with a narrow decimal-point column
+    function layoutColumns() {
+      const layout = [{ type: "op" }];
+      for (let i = 0; i < question.columns; i++) {
+        if (question.dp && i === question.columns - question.dp) layout.push({ type: "point" });
+        layout.push({ type: "digit", col: i });
+      }
+      return layout;
+    }
+
+    function stepIndexFor(kind, col) {
+      return question.steps.findIndex(step => step.kind === kind && step.col === col);
+    }
+
+    function makeCell(className, text) {
+      const cell = document.createElement("div");
+      cell.className = `cell ${className}`;
+      cell.textContent = text;
+      return cell;
+    }
+
+    function renderBoard() {
+      const q = question;
+      const layout = layoutColumns();
+      board.innerHTML = "";
+      board.style.gridTemplateColumns = layout
+        .map(item => (item.type === "point" ? "calc(var(--cell) * 0.4)" : "var(--cell)"))
+        .join(" ");
+
+      // Carry row
+      layout.forEach(item => {
+        const slot = document.createElement("div");
+        slot.className = item.type === "point" ? "" : "carry-slot";
+        if (item.type === "digit" && q.carryInto[item.col] !== null) {
+          const index = stepIndexFor("carry", item.col);
+          const box = document.createElement("button");
+          box.type = "button";
+          box.className = "carry";
+          if (index < revealed) {
+            box.classList.add("is-revealed");
+            box.textContent = String(q.carryInto[item.col]);
+          } else if (index === revealed) {
+            box.classList.add("is-next");
+            box.textContent = "?";
+            box.addEventListener("click", revealNext);
+          }
+          slot.appendChild(box);
+        }
+        board.appendChild(slot);
+      });
+
+      // Number rows
+      const numberRow = (digits, placeholders, operator) => {
+        layout.forEach(item => {
+          if (item.type === "op") {
+            board.appendChild(makeCell("op", operator));
+          } else if (item.type === "point") {
+            board.appendChild(makeCell("point", digits.some(d => d !== null) ? "." : ""));
+          } else if (digits[item.col] === null) {
+            board.appendChild(makeCell("", ""));
+          } else if (placeholders.has(item.col)) {
+            board.appendChild(makeCell("placeholder", String(digits[item.col])));
+          } else {
+            board.appendChild(makeCell("digit", String(digits[item.col])));
+          }
+        });
+      };
+
+      numberRow(q.A, q.placeholderA, "");
+      numberRow(q.B, q.placeholderB, "+");
+
+      const rule = document.createElement("div");
+      rule.className = "rule";
+      board.appendChild(rule);
+
+      // Answer row
+      layout.forEach(item => {
+        if (item.type === "op") {
+          board.appendChild(makeCell("", ""));
+        } else if (item.type === "point") {
+          board.appendChild(makeCell("point", "."));
+        } else if (q.S[item.col] === null) {
+          board.appendChild(makeCell("", ""));
+        } else {
+          const index = stepIndexFor("answer", item.col);
+          const cell = document.createElement("button");
+          cell.type = "button";
+          cell.className = "cell answer";
+          if (index < revealed) {
+            cell.classList.add("is-revealed");
+            cell.textContent = String(q.S[item.col]);
+          } else {
+            cell.textContent = "?";
+            if (index === revealed) {
+              cell.classList.add("is-next");
+              cell.addEventListener("click", revealNext);
+            }
+          }
+          board.appendChild(cell);
+        }
+      });
+
+      const finalRule = document.createElement("div");
+      finalRule.className = "rule final";
+      board.appendChild(finalRule);
+    }
+
+    // Size the boxes so the whole workout fits the space without scrolling
+    function fitBoard() {
+      const layout = layoutColumns();
+      const widthUnits = layout.reduce((sum, item) => sum + (item.type === "point" ? 0.4 : 1), 0) + (layout.length - 1) * 0.14;
+      const heightUnits = 0.6 + 3 + 0.07 * 2 + 5 * 0.14;
+      const availableWidth = boardArea.clientWidth * 0.94;
+      const availableHeight = boardArea.clientHeight * 0.94;
+      const cell = Math.max(26, Math.min(availableWidth / widthUnits, availableHeight / heightUnits, 110));
+      board.style.setProperty("--cell", `${Math.floor(cell)}px`);
+    }
+
+    function renderStepText() {
+      if (revealed === 0) {
+        stepText.textContent = startPrompt();
+        stepText.classList.add("is-prompt");
+      } else if (revealed >= question.steps.length) {
+        stepText.textContent = `${explain(question.steps[question.steps.length - 1])}  Answer: ${question.text} = ${question.answerText}`;
+        stepText.classList.remove("is-prompt");
+      } else {
+        stepText.textContent = explain(question.steps[revealed - 1]);
+        stepText.classList.remove("is-prompt");
+      }
+    }
+
+    function renderWorkout() {
+      renderBoard();
+      renderStepText();
+      fitBoard();
+    }
+
+    function render() {
+      renderLevels();
+      questionDisplay.textContent = question.text;
+      renderWorkout();
+    }
+
+    function revealNext() {
+      if (revealed < question.steps.length) {
+        revealed += 1;
+        renderWorkout();
+      }
+    }
+
+    function newQuestion() {
+      question = generateQuestion(currentYear);
+      revealed = 0;
+      render();
+    }
+
+    document.getElementById("newQuestion").addEventListener("click", newQuestion);
+    document.getElementById("revealNext").addEventListener("click", revealNext);
+
+    document.getElementById("revealAll").addEventListener("click", () => {
+      revealed = question.steps.length;
+      renderWorkout();
+    });
+
+    document.getElementById("hideAll").addEventListener("click", () => {
+      revealed = 0;
+      renderWorkout();
+    });
+
+    document.querySelectorAll(".hint-toggle").forEach(button => {
+      const body = button.nextElementSibling;
+      button.addEventListener("click", () => {
+        const isRevealed = button.getAttribute("aria-expanded") === "true";
+        button.setAttribute("aria-expanded", isRevealed ? "false" : "true");
+        button.classList.toggle("is-revealed", !isRevealed);
+        body.hidden = isRevealed;
+      });
+    });
+
+    window.addEventListener("resize", fitBoard);
+
+    document.querySelectorAll("[data-page]").forEach(link => {
+      link.addEventListener("click", event => {
+        if (window.google && google.script && google.script.run) {
+          event.preventDefault();
+          google.script.run
+            .withSuccessHandler(html => {
+              document.open();
+              document.write(html);
+              document.close();
+            })
+            .loadPage(link.getAttribute("data-page"));
+        }
+      });
+    });
+
+    newQuestion();
+  </script>
+</body>
+</html>
