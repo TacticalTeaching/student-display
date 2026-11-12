@@ -136,20 +136,6 @@
         grid-template-columns: 1fr;
       }
     }
-    /* Greyscale printouts: on-screen colour is kept, prints are black, white and grey */
-    @media print {
-      html {
-        filter: grayscale(1);
-      }
-
-      html, body {
-        background: #fff;
-      }
-
-      body::before {
-        display: none;
-      }
-    }
   </style>
 </head>
 <body>

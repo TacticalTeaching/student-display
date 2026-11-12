@@ -670,32 +670,6 @@
     }
 
     @media print {
-      /* Greyscale printouts: on-screen colour is kept, prints are black, white and grey */
-      html {
-        filter: grayscale(1);
-      }
-
-      html, body {
-        background: #fff;
-      }
-
-      .box-b,
-      .box-d,
-      .step-output,
-      .step-output.is-hidden,
-      .steps-title,
-      .year-badge-label {
-        background: #fff !important;
-        color: #000 !important;
-        border-color: #000 !important;
-      }
-
-      .step-toggle,
-      .step-toggle.is-revealed {
-        background: #e6e6e6 !important;
-        color: #000 !important;
-      }
-
       body::before,
       .left-col,
       .box-e,
@@ -718,26 +692,6 @@
       .box-b,
       .box-d {
         margin-top: 12px;
-      }
-
-      .center-col,
-      .box-d,
-      .steps {
-        display: block;
-        overflow: visible;
-      }
-
-      .box-b {
-        min-height: 160px;
-      }
-
-      .step-row {
-        min-height: 64px;
-        margin-top: 10px;
-      }
-
-      .step-output {
-        overflow: visible;
       }
 
       .step-output.is-hidden::before {
