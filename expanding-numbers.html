@@ -669,36 +669,6 @@
       border: 0;
     }
 
-    @media print {
-      body::before,
-      .left-col,
-      .box-e,
-      .nav-group {
-        display: none;
-      }
-
-      .app {
-        height: auto;
-        max-height: none;
-        overflow: visible;
-        padding: 0;
-      }
-
-      .top-bar,
-      .workspace {
-        display: block;
-      }
-
-      .box-b,
-      .box-d {
-        margin-top: 12px;
-      }
-
-      .step-output.is-hidden::before {
-        content: "";
-      }
-    }
-
     @media (max-width: 900px) {
       .app {
         height: auto;
