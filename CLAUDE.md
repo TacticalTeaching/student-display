@@ -5,7 +5,7 @@ Interactive maths displays for a NZ Year 7–8 classroom, shown on a classroom T
 Also read `TODO.md` for small fixes still to do, and `curriculum-groupings/README.md` for the year-level plan.
 
 ## How the site is hosted
-- **GitHub Pages** serves the `main` branch at `https://tactialteaching.github.io/student-display/`.
+- **GitHub Pages** serves the `main` branch at `https://tacticalteaching.github.io/student-display/`.
 - `index.html` redirects to `home.html`.
 - Pages must also still work inside **Google Apps Script** (`Code.gs` serves each `.html` file by name). Keep both working.
 
