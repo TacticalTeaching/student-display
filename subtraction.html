@@ -517,6 +517,22 @@
       text-decoration-thickness: 2px;
     }
 
+    /* A small exchanged 1 tucked in front of a digit that only receives */
+    .cell.digit,
+    .cell.placeholder {
+      position: relative;
+    }
+
+    .tuck {
+      position: absolute;
+      top: calc(var(--cell) * 0.04);
+      left: calc(var(--cell) * 0.07);
+      color: var(--coral);
+      font-size: calc(var(--cell) * 0.3);
+      font-weight: 900;
+      line-height: 1;
+      text-decoration: none;
+    }
 
     .exchange {
       min-width: calc(var(--cell) * 0.38);
@@ -1037,17 +1053,22 @@
       return question.steps.findIndex(step => step.kind === kind && step.col === col);
     }
 
-    // What is written above a column's top digit after the first `upTo` steps:
+    // What is written above/on a column's top digit after the first `upTo` steps:
     // squares = values written above (oldest first, all but the last are crossed out),
-    // crossed = the digit itself is crossed out
+    // crossed = the digit itself is crossed out, tuck = a small 1 tucked in front of it
     function columnMarks(col, upTo) {
-      const marks = { squares: [], crossed: false };
+      const marks = { squares: [], crossed: false, tuck: false };
       question.steps.forEach((step, index) => {
         if (step.kind !== "exchange" || index >= upTo) return;
         step.changes.forEach(change => {
           if (change.col !== col) return;
-          marks.squares.push(change.to);
-          marks.crossed = true;
+          const isReceiver = change.col === step.col;
+          if (isReceiver && marks.squares.length === 0) {
+            marks.tuck = true;
+          } else {
+            marks.squares.push(change.to);
+            marks.crossed = true;
+          }
         });
       });
       return marks;
@@ -1116,6 +1137,12 @@
           const cell = makeCell(kind, String(q.A[item.col]));
           const marks = columnMarks(item.col, revealed);
           if (marks.crossed) cell.classList.add("is-crossed");
+          if (marks.tuck) {
+            const tuck = document.createElement("span");
+            tuck.className = "tuck";
+            tuck.textContent = "1";
+            cell.appendChild(tuck);
+          }
           board.appendChild(cell);
         }
       });
