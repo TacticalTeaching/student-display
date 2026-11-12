@@ -16,6 +16,8 @@
       --green-light: #e8f4ef;
       --yellow: #f0c958;
       --radius: 20px;
+      /* One spacing value: under the title bar and between the tiles */
+      --space: clamp(12px, 1.8vw, 22px);
     }
 
     * {
@@ -52,7 +54,7 @@
       padding: clamp(16px, 3.5vh, 44px) clamp(16px, 2.5vw, 36px);
       display: grid;
       grid-template-rows: auto minmax(0, 1fr);
-      gap: clamp(16px, 3vh, 36px);
+      gap: var(--space);
       align-items: center;
       overflow: hidden;
     }
@@ -76,7 +78,7 @@
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       grid-auto-rows: clamp(96px, 22vh, 220px);
-      gap: clamp(12px, 1.8vw, 22px);
+      gap: var(--space);
       width: 100%;
       align-self: start;
       align-content: start;
@@ -158,6 +160,7 @@
       <div class="topic-card is-inactive" aria-disabled="true">Rational Numbers</div>
       <div class="topic-card is-inactive" aria-disabled="true">Basic Facts</div>
       <div class="topic-card is-inactive" aria-disabled="true">Vocabulary</div>
+      <div class="topic-card is-inactive" aria-disabled="true">Notes</div>
     </main>
   </div>
 
