@@ -541,7 +541,7 @@
       border-style: dashed;
     }
 
-    /* The decimal point sits in the normal gap between boxes, so every column stays lined up */
+    /* The decimal point sits low in the gap, between the rounded corners, so every column stays lined up */
     .cell.has-point,
     .cell.point-pending {
       position: relative;
@@ -552,9 +552,9 @@
     .cell.point-pending::after {
       content: "";
       position: absolute;
-      --dot: max(5px, calc(var(--cell) * 0.09));
+      --dot: max(6px, calc(var(--cell) * 0.12));
       right: calc(var(--cell) * -0.07 - var(--dot) / 2);
-      bottom: calc(var(--cell) * 0.08);
+      bottom: calc(var(--dot) * -0.2);
       width: var(--dot);
       height: var(--dot);
       border-radius: 50%;
