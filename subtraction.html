@@ -499,10 +499,39 @@
     /* Exchange box sits small, above the top-left corner of the digit it belongs to */
     .exchange-slot {
       width: var(--cell);
-      height: calc(var(--cell) * 0.42);
-      display: grid;
-      align-items: end;
-      justify-items: start;
+      height: calc(var(--cell) * 0.42 * var(--stack, 1) + 3px * (var(--stack, 1) - 1));
+      display: flex;
+      flex-direction: column;
+      justify-content: end;
+      align-items: start;
+      gap: 3px;
+    }
+
+    /* An earlier exchanged value is crossed out, with the newer value stacked above */
+    .exchange.is-revealed.is-old {
+      border-color: #9cacb7;
+      background: #fff;
+      color: var(--muted);
+      text-decoration: line-through;
+      text-decoration-color: var(--red);
+      text-decoration-thickness: 2px;
+    }
+
+    /* A small exchanged 1 tucked in front of a digit that only receives */
+    .cell.digit,
+    .cell.placeholder {
+      position: relative;
+    }
+
+    .tuck {
+      position: absolute;
+      top: calc(var(--cell) * 0.04);
+      left: calc(var(--cell) * 0.07);
+      color: var(--coral);
+      font-size: calc(var(--cell) * 0.3);
+      font-weight: 900;
+      line-height: 1;
+      text-decoration: none;
     }
 
     .exchange {
@@ -1024,16 +1053,33 @@
       return question.steps.findIndex(step => step.kind === kind && step.col === col);
     }
 
-    // Latest revealed new value for a column's top digit (after exchanging), or null
-    function exchangedValue(col) {
-      let value = null;
+    // What is written above/on a column's top digit after the first `upTo` steps:
+    // squares = values written above (oldest first, all but the last are crossed out),
+    // crossed = the digit itself is crossed out, tuck = a small 1 tucked in front of it
+    function columnMarks(col, upTo) {
+      const marks = { squares: [], crossed: false, tuck: false };
       question.steps.forEach((step, index) => {
-        if (step.kind !== "exchange" || index >= revealed) return;
+        if (step.kind !== "exchange" || index >= upTo) return;
         step.changes.forEach(change => {
-          if (change.col === col) value = change.to;
+          if (change.col !== col) return;
+          const isReceiver = change.col === step.col;
+          if (isReceiver && marks.squares.length === 0) {
+            marks.tuck = true;
+          } else {
+            marks.squares.push(change.to);
+            marks.crossed = true;
+          }
         });
       });
-      return value;
+      return marks;
+    }
+
+    function stackDepth() {
+      let depth = 1;
+      for (let col = 0; col < question.columns; col++) {
+        depth = Math.max(depth, columnMarks(col, question.steps.length).squares.length);
+      }
+      return depth;
     }
 
     function makeCell(className, text) {
@@ -1048,6 +1094,7 @@
       const layout = layoutColumns();
       const nextStep = q.steps[revealed];
       board.innerHTML = "";
+      board.style.setProperty("--stack", String(stackDepth()));
       board.style.gridTemplateColumns = layout
         .map(item => (item.type === "point" ? "calc(var(--cell) * 0.4)" : "var(--cell)"))
         .join(" ");
@@ -1058,7 +1105,7 @@
         slot.className = item.type === "point" ? "" : "exchange-slot";
         if (item.type === "digit") {
           const isNext = nextStep && nextStep.kind === "exchange" && nextStep.col === item.col;
-          const value = exchangedValue(item.col);
+          const marks = columnMarks(item.col, revealed);
           if (isNext) {
             const box = document.createElement("button");
             box.type = "button";
@@ -1066,12 +1113,15 @@
             box.textContent = "?";
             box.addEventListener("click", revealNext);
             slot.appendChild(box);
-          } else if (value !== null) {
+          }
+          // Newest value on top, older values crossed out underneath
+          marks.squares.slice().reverse().forEach((value, i) => {
             const box = document.createElement("div");
             box.className = "exchange is-revealed";
+            if (i > 0 || isNext) box.classList.add("is-old");
             box.textContent = String(value);
             slot.appendChild(box);
-          }
+          });
         }
         board.appendChild(slot);
       });
@@ -1085,7 +1135,14 @@
         } else {
           const kind = q.placeholderA.has(item.col) ? "placeholder" : "digit";
           const cell = makeCell(kind, String(q.A[item.col]));
-          if (exchangedValue(item.col) !== null) cell.classList.add("is-crossed");
+          const marks = columnMarks(item.col, revealed);
+          if (marks.crossed) cell.classList.add("is-crossed");
+          if (marks.tuck) {
+            const tuck = document.createElement("span");
+            tuck.className = "tuck";
+            tuck.textContent = "1";
+            cell.appendChild(tuck);
+          }
           board.appendChild(cell);
         }
       });
@@ -1144,7 +1201,7 @@
     function fitBoard() {
       const layout = layoutColumns();
       const widthUnits = layout.reduce((sum, item) => sum + (item.type === "point" ? 0.4 : 1), 0) + (layout.length - 1) * 0.14;
-      const heightUnits = 0.42 + 3 + 0.07 * 2 + 5 * 0.14;
+      const heightUnits = 0.47 * stackDepth() + 3 + 0.07 * 2 + 5 * 0.14;
       const availableWidth = boardArea.clientWidth * 0.94;
       const availableHeight = boardArea.clientHeight * 0.94;
       const cell = Math.max(26, Math.min(availableWidth / widthUnits, availableHeight / heightUnits, 110));
