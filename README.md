@@ -10,6 +10,7 @@ Simple calculators and interactive displays for the classroom. Plain HTML, CSS a
 | `css/style.css` | Shared black, white and grey style (large text, touch friendly) |
 | `tools/calculator.html` | Big on-screen calculator (works with the keyboard too) |
 | `tools/timer.html` | Countdown timer with progress bar and beep |
+| `curriculum-groupings/README.md` | Master Year 0–8 grouping plan for the 18 interactive display families |
 
 ## Adding a new tool
 
