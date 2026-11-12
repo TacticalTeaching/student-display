@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet"><style>
+body{margin:0;min-height:100vh;color:#18212f;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:#f8f8f6}
+body::before{content:"";position:fixed;inset:0;z-index:-1;opacity:.5;background-image:linear-gradient(rgba(74,124,190,.28) 1px,transparent 1px),linear-gradient(90deg,rgba(74,124,190,.28) 1px,transparent 1px);background-size:28px 28px}
+a{color:#18212f;text-decoration:none}a:hover{color:#0f5949}
+</style></helmet>
+<div style="width:min(1200px,calc(100% - 32px));margin:0 auto;padding:28px 0 48px;display:grid;gap:20px">
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <a href="Student Home.dc.html" style="border:2px solid #18212f;border-radius:999px;background:#fff;padding:8px 18px;font-weight:900">Home</a>
+    <a href="Protractor.dc.html" style="border:2px solid #18212f;border-radius:999px;background:#fff;padding:8px 18px;font-weight:900">Protractor</a>
+    <a href="Complementary Angles.dc.html" style="border:2px solid #18212f;border-radius:999px;background:#fff;padding:8px 18px;font-weight:900">Complementary</a>
+    <h1 style="margin:0 0 0 8px;font-family:Caveat,cursive;font-size:2.8rem;line-height:1;color:#c8352b">Supplementary Angles</h1>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;border:2px solid #18212f;border-radius:24px;background:rgba(255,255,255,.94);padding:16px 24px">
+    <div style="display:flex;align-items:center;gap:14px;font-size:clamp(2.2rem,6vw,3.6rem);font-weight:950;line-height:1;font-variant-numeric:tabular-nums">
+      <span style="border:3px solid #2f6fb5;color:#2f6fb5;border-radius:16px;padding:6px 14px;min-width:2.6ch;text-align:center;background:#eaf2fb">{{ aText }}</span>
+      <span>+</span>
+      <span style="border:3px solid #c8352b;color:#c8352b;border-radius:16px;padding:6px 14px;min-width:2.6ch;text-align:center;background:#fbeceb">{{ bText }}</span>
+      <span>=</span>
+      <span>180°</span>
+    </div>
+    <div style="color:#4b5668;font-size:1rem;max-width:30ch;text-wrap:pretty">{{ hint }}</div>
+  </div>
+  <div style="border:2px solid #18212f;border-radius:24px;background:rgba(255,255,255,.7);padding:16px 12px 12px;display:grid;justify-items:center;gap:8px">
+    <div style="position:relative;width:min(100%,1000px);aspect-ratio:640/360;container-type:inline-size">
+      <svg ref="{{ svgRef }}" viewBox="0 0 640 360" style="position:absolute;inset:0;width:100%;height:100%;touch-action:none;user-select:none;display:block;overflow:visible">
+        <path d="M30 330 A290 290 0 0 1 610 330 Z" fill="rgba(236,237,232,.88)" stroke="#8d918c" stroke-width="1.5" stroke-linejoin="round" style="filter:drop-shadow(0 6px 10px rgba(24,33,47,.14))"></path>
+        <sc-for list="{{ ticks }}" as="t" hint-placeholder-count="0">
+          <line x1="{{ t.x1 }}" y1="{{ t.y1 }}" x2="{{ t.x2 }}" y2="{{ t.y2 }}" stroke="#2a2f33" stroke-width="{{ t.w }}"></line>
+        </sc-for>
+        <path d="M88 330 A232 232 0 0 1 552 330" fill="none" stroke="#2a2f33" stroke-width="1"></path>
+        <path d="{{ aSector }}" fill="#bcd4ef" fill-opacity=".85" stroke="#2f6fb5" stroke-width="1.5"></path>
+        <path d="{{ bSector }}" fill="{{ bFill }}" fill-opacity=".85" stroke="#c8352b" stroke-width="1.5"></path>
+        <line x1="0" y1="330" x2="640" y2="330" stroke="#18212f" stroke-width="2.5" stroke-linecap="round"></line>
+        <g onPointerDown="{{ startDrag }}" style="cursor:grab">
+          <line x1="320" y1="330" x2="{{ arm.x }}" y2="{{ arm.y }}" stroke="transparent" stroke-width="28"></line>
+          <line x1="320" y1="330" x2="{{ arm.x }}" y2="{{ arm.y }}" stroke="#7a3fb0" stroke-width="2.5" stroke-linecap="round"></line>
+          <circle cx="{{ arm.x }}" cy="{{ arm.y }}" r="15" fill="#7a3fb0" stroke="#fff" stroke-width="3"></circle>
+        </g>
+        <circle cx="320" cy="330" r="4" fill="#18212f"></circle>
+      </svg>
+      <sc-for list="{{ labels }}" as="l" hint-placeholder-count="0">
+        <div style="position:absolute;left:{{ l.px }}%;top:{{ l.py }}%;transform:translate(-50%,-50%) rotate({{ l.rot }}deg);font-size:2.1cqw;font-weight:500;color:#2a2f33;line-height:1;font-variant-numeric:tabular-nums;pointer-events:none">{{ l.t }}</div>
+      </sc-for>
+      <div style="position:absolute;left:{{ aLabel.px }}%;top:{{ aLabel.py }}%;transform:translate(-50%,-50%);font-size:2.8cqw;font-weight:950;color:#2f6fb5;line-height:1;pointer-events:none">{{ aText }}</div>
+      <div style="position:absolute;left:{{ bLabel.px }}%;top:{{ bLabel.py }}%;transform:translate(-50%,-50%);font-size:2.8cqw;font-weight:950;color:#c8352b;line-height:1;pointer-events:none">{{ bText }}</div>
+    </div>
+    <div style="color:#4b5668;font-size:.95rem;text-align:center;text-wrap:pretty">{{ instruction }}</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding-top:4px">
+      <button onClick="{{ toggleQuiz }}" style="border:2px solid #18212f;border-radius:999px;background:{{ quizBg }};color:{{ quizColor }};padding:10px 26px;font:inherit;font-size:1.1rem;font-weight:900;cursor:pointer;min-height:44px">{{ quizLabel }}</button>
+      <sc-if value="{{ quiz }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ newQuestion }}" style="border:2px solid #18212f;border-radius:999px;background:#fff;padding:10px 26px;font:inherit;font-size:1.1rem;font-weight:900;cursor:pointer;min-height:44px">New question</button>
+        <button onClick="{{ toggleReveal }}" style="border:2px solid #18212f;border-radius:999px;background:#f0c958;padding:10px 26px;font:inherit;font-size:1.1rem;font-weight:900;cursor:pointer;min-height:44px">{{ revealLabel }}</button>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;snapStep&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;1&quot;,&quot;5&quot;,&quot;15&quot;],&quot;default&quot;:&quot;1&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { a: 60, drag: false, quiz: false, revealed: false };
+  svgRef = React.createRef();
+  componentDidMount() {
+    this.move = e => {
+      if (!this.state.drag || !this.svgRef.current) return;
+      const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(this.svgRef.current.getScreenCTM().inverse());
+      const step = Number(this.props.snapStep ?? 1);
+      let deg = Math.atan2(330 - p.y, p.x - 320) * 180 / Math.PI;
+      if (deg < 0) deg = deg < -90 ? 180 : 0;
+      deg = Math.min(180, Math.max(0, Math.round(deg / step) * step));
+      if (deg !== this.state.a) this.setState({ a: deg, revealed: false });
+    };
+    this.up = () => this.state.drag && this.setState({ drag: false });
+    window.addEventListener('pointermove', this.move);
+    window.addEventListener('pointerup', this.up);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('pointermove', this.move);
+    window.removeEventListener('pointerup', this.up);
+  }
+  pt(deg, r) {
+    const t = deg * Math.PI / 180;
+    const x = 320 + r * Math.cos(t), y = 330 - r * Math.sin(t);
+    return { x: +x.toFixed(2), y: +y.toFixed(2), px: +(x / 6.4).toFixed(3), py: +(y / 3.6).toFixed(3) };
+  }
+  sector(from, to, r) {
+    if (to - from <= 0) return '';
+    const s = this.pt(from, r), e = this.pt(to, r);
+    return `M320 330 L${s.x} ${s.y} A${r} ${r} 0 0 0 ${e.x} ${e.y} Z`;
+  }
+  renderVals() {
+    if (!this.ticks) {
+      this.ticks = []; this.labels = [];
+      for (let d = 0; d <= 180; d++) {
+        const ten = d % 10 === 0, five = d % 5 === 0;
+        const o = this.pt(d, 290), i = this.pt(d, 290 - (ten ? 22 : five ? 15 : 9));
+        this.ticks.push({ x1: o.x, y1: o.y, x2: i.x, y2: i.y, w: ten ? 1.2 : 0.7 });
+        if (ten) {
+          let p = this.pt(d, 250);
+          if (d % 180 === 0) p = { ...p, py: +((p.y - 12) / 3.6).toFixed(3) };
+          this.labels.push({ ...p, t: String(d), rot: 90 - d });
+        }
+      }
+    }
+    const { a, quiz, revealed } = this.state;
+    const b = 180 - a, hide = quiz && !revealed;
+    return {
+      svgRef: this.svgRef,
+      ticks: this.ticks, labels: this.labels,
+      arm: this.pt(a, 322),
+      startDrag: e => { e.preventDefault(); this.setState({ drag: true }, () => this.move(e)); },
+      aSector: this.sector(0, a, 80),
+      bSector: this.sector(a, 180, 80),
+      bFill: hide ? '#e4e7ec' : '#f2c6c1',
+      aLabel: this.pt(a / 2, 118),
+      bLabel: this.pt(a + b / 2, 118),
+      aText: a + '°',
+      bText: hide ? '?°' : b + '°',
+      hint: hide ? 'The two angles add to 180°. What is the missing red angle?' : 'Supplementary angles add up to 180°.',
+      instruction: quiz ? 'Work out the red angle, then check with the answer key.' : 'Drag the purple arm to split the straight line into two angles.',
+      quiz,
+      quizLabel: quiz ? 'Exit quiz' : 'Quiz',
+      quizBg: quiz ? '#18212f' : '#fff',
+      quizColor: quiz ? '#fff' : '#18212f',
+      revealLabel: revealed ? 'Hide answer' : 'Answer key',
+      toggleQuiz: () => this.setState(s => ({ quiz: !s.quiz, revealed: false })),
+      toggleReveal: () => this.setState(s => ({ revealed: !s.revealed })),
+      newQuestion: () => {
+        const step = Math.max(1, Number(this.props.snapStep ?? 1));
+        let n; do { n = Math.round((10 + Math.random() * 160) / step) * step; } while (n === a || n <= 0 || n >= 180);
+        this.setState({ a: n, revealed: false });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet"><style>
+body{margin:0;min-height:100vh;color:#18212f;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:#f8f8f6}
+body::before{content:"";position:fixed;inset:0;z-index:-1;opacity:.5;background-image:linear-gradient(rgba(74,124,190,.28) 1px,transparent 1px),linear-gradient(90deg,rgba(74,124,190,.28) 1px,transparent 1px);background-size:28px 28px}
+a{color:#18212f;text-decoration:none}a:hover{color:#0f5949}
+</style></helmet>
+<div style="width:min(1200px,calc(100% - 32px));margin:0 auto;padding:28px 0 48px;display:grid;gap:20px">
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <a href="Student Home.dc.html" style="border:2px solid #18212f;border-radius:999px;background:#fff;padding:8px 18px;font-weight:900">Home</a>
+    <h1 style="margin:0 0 0 8px;font-family:Caveat,cursive;font-size:2.8rem;line-height:1;color:#c8352b">Protractor</h1>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;border:2px solid #18212f;border-radius:24px;background:rgba(255,255,255,.94);padding:16px 24px">
+    <sc-if value="{{ showAnswer }}" hint-placeholder-val="{{ true }}">
+      <div style="font-size:clamp(2.6rem,7vw,4rem);font-weight:950;line-height:1;font-variant-numeric:tabular-nums;min-width:3.2ch;text-align:right">{{ angleText }}</div>
+      <div style="border:2px solid #18212f;border-radius:999px;padding:8px 20px;font-size:1.4rem;font-weight:900;background:{{ typeBg }}">{{ typeName }}</div>
+      <div style="color:#4b5668;font-size:1rem;max-width:30ch;text-wrap:pretty">{{ typeRule }}</div>
+    </sc-if>
+    <sc-if value="{{ hideAnswer }}" hint-placeholder-val="{{ false }}">
+      <div style="font-size:clamp(2.6rem,7vw,4rem);font-weight:950;line-height:1;min-width:3.2ch;text-align:right">?°</div>
+      <div style="border:2px solid #18212f;border-radius:999px;padding:8px 20px;font-size:1.4rem;font-weight:900;background:#fff">Quiz</div>
+      <div style="color:#4b5668;font-size:1rem;max-width:30ch;text-wrap:pretty">Read the protractor. How big is the angle, and what type is it?</div>
+    </sc-if>
+  </div>
+  <div style="border:2px solid #18212f;border-radius:24px;background:rgba(255,255,255,.7);padding:16px 12px 12px;display:grid;justify-items:center;gap:8px">
+    <div style="position:relative;width:min(100%,1060px);aspect-ratio:640/360;container-type:inline-size">
+      <svg ref="{{ svgRef }}" viewBox="0 0 640 360" style="position:absolute;inset:0;width:100%;height:100%;touch-action:none;user-select:none;display:block;overflow:visible">
+        <path d="M30 330 A290 290 0 0 1 610 330 Z" fill="rgba(236,237,232,.88)" stroke="#8d918c" stroke-width="1.5" stroke-linejoin="round" style="filter:drop-shadow(0 6px 10px rgba(24,33,47,.14))"></path>
+        <path d="{{ sectorPath }}" fill="{{ sectorFill }}" fill-opacity=".7" stroke="#18212f" stroke-width="1.5"></path>
+        <sc-for list="{{ ticks }}" as="t" hint-placeholder-count="0">
+          <line x1="{{ t.x1 }}" y1="{{ t.y1 }}" x2="{{ t.x2 }}" y2="{{ t.y2 }}" stroke="#2a2f33" stroke-width="{{ t.w }}"></line>
+        </sc-for>
+        <path d="M88 330 A232 232 0 0 1 552 330" fill="none" stroke="#2a2f33" stroke-width="1"></path>
+        <sc-for list="{{ guides }}" as="t" hint-placeholder-count="0">
+          <line x1="{{ t.x1 }}" y1="{{ t.y1 }}" x2="{{ t.x2 }}" y2="{{ t.y2 }}" stroke="#2a2f33" stroke-width=".9"></line>
+        </sc-for>
+        <path d="M274 330 A46 46 0 0 1 366 330" fill="none" stroke="#2a2f33" stroke-width="1"></path>
+        <line x1="320" y1="330" x2="320" y2="98" stroke="#2a2f33" stroke-width="1"></line>
+        <line x1="128" y1="330" x2="512" y2="330" stroke="#2a2f33" stroke-width="1"></line>
+        <sc-if value="{{ showRightMark }}" hint-placeholder-val="{{ false }}">
+          <path d="{{ rightMark }}" fill="none" stroke="#18212f" stroke-width="2.5"></path>
+        </sc-if>
+        <g onPointerDown="{{ startA }}" style="cursor:grab">
+          <line x1="320" y1="330" x2="{{ a.x }}" y2="{{ a.y }}" stroke="transparent" stroke-width="28"></line>
+          <line x1="320" y1="330" x2="{{ a.x }}" y2="{{ a.y }}" stroke="#2f6fb5" stroke-width="2.5" stroke-linecap="round"></line>
+          <circle cx="{{ a.x }}" cy="{{ a.y }}" r="15" fill="#2f6fb5" stroke="#fff" stroke-width="3"></circle>
+        </g>
+        <g onPointerDown="{{ startB }}" style="cursor:grab">
+          <line x1="320" y1="330" x2="{{ b.x }}" y2="{{ b.y }}" stroke="transparent" stroke-width="28"></line>
+          <line x1="320" y1="330" x2="{{ b.x }}" y2="{{ b.y }}" stroke="#c8352b" stroke-width="2.5" stroke-linecap="round"></line>
+          <circle cx="{{ b.x }}" cy="{{ b.y }}" r="15" fill="#c8352b" stroke="#fff" stroke-width="3"></circle>
+        </g>
+        <circle cx="320" cy="330" r="4" fill="#18212f"></circle>
+      </svg>
+      <sc-for list="{{ labels }}" as="l" hint-placeholder-count="0">
+        <div style="position:absolute;left:{{ l.px }}%;top:{{ l.py }}%;transform:translate(-50%,-50%) rotate({{ l.rot }}deg);font-size:2.1cqw;font-weight:500;color:#2a2f33;line-height:1;font-variant-numeric:tabular-nums;pointer-events:none">{{ l.t }}</div>
+      </sc-for>
+      <sc-if value="{{ showInner }}" hint-placeholder-val="{{ false }}">
+        <sc-for list="{{ innerLabels }}" as="l" hint-placeholder-count="0">
+          <div style="position:absolute;left:{{ l.px }}%;top:{{ l.py }}%;transform:translate(-50%,-50%) rotate({{ l.rot }}deg);font-size:1.75cqw;font-weight:500;line-height:1;color:#2a2f33;font-variant-numeric:tabular-nums;pointer-events:none">{{ l.t }}</div>
+        </sc-for>
+      </sc-if>
+      <sc-if value="{{ showAnswer }}" hint-placeholder-val="{{ true }}">
+        <div style="position:absolute;left:{{ arcLabel.px }}%;top:{{ arcLabel.py }}%;transform:translate(-50%,-50%);font-size:2.8cqw;font-weight:950;line-height:1;pointer-events:none">{{ angleText }}</div>
+      </sc-if>
+    </div>
+    <div style="color:#4b5668;font-size:.95rem">Drag the blue or red arm to change the angle.</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding-top:4px">
+      <button onClick="{{ toggleQuiz }}" style="border:2px solid #18212f;border-radius:999px;background:{{ quizBg }};color:{{ quizColor }};padding:10px 26px;font:inherit;font-size:1.1rem;font-weight:900;cursor:pointer;min-height:44px">{{ quizLabel }}</button>
+      <sc-if value="{{ quiz }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ toggleReveal }}" style="border:2px solid #18212f;border-radius:999px;background:#f0c958;padding:10px 26px;font:inherit;font-size:1.1rem;font-weight:900;cursor:pointer;min-height:44px">{{ revealLabel }}</button>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;snapStep&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;1&quot;,&quot;5&quot;,&quot;15&quot;],&quot;default&quot;:&quot;1&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showInnerScale&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { a: 0, b: 50, drag: null, quiz: false, revealed: false };
+  svgRef = React.createRef();
+  componentDidMount() {
+    this.move = e => {
+      if (!this.state.drag || !this.svgRef.current) return;
+      const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(this.svgRef.current.getScreenCTM().inverse());
+      const step = Number(this.props.snapStep ?? 1);
+      let deg = Math.atan2(330 - p.y, p.x - 320) * 180 / Math.PI;
+      if (deg < 0) deg = deg < -90 ? 180 : 0;
+      deg = Math.min(180, Math.max(0, Math.round(deg / step) * step));
+      if (deg !== this.state[this.state.drag]) this.setState({ [this.state.drag]: deg, revealed: false });
+    };
+    this.up = () => this.state.drag && this.setState({ drag: null });
+    window.addEventListener('pointermove', this.move);
+    window.addEventListener('pointerup', this.up);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('pointermove', this.move);
+    window.removeEventListener('pointerup', this.up);
+  }
+  pt(deg, r) {
+    const t = deg * Math.PI / 180;
+    const x = 320 + r * Math.cos(t), y = 330 - r * Math.sin(t);
+    return { x: +x.toFixed(2), y: +y.toFixed(2), px: +(x / 6.4).toFixed(3), py: +(y / 3.6).toFixed(3) };
+  }
+  start(which) { return e => { e.preventDefault(); this.setState({ drag: which }, () => this.move(e)); }; }
+  renderVals() {
+    if (!this.ticks) {
+      this.ticks = []; this.guides = []; this.labels = []; this.innerLabels = [];
+      const seg = (d, r1, r2, w) => { const o = this.pt(d, r1), i = this.pt(d, r2); return { x1: o.x, y1: o.y, x2: i.x, y2: i.y, w }; };
+      for (let d = 0; d <= 180; d++) {
+        const ten = d % 10 === 0, five = d % 5 === 0;
+        this.ticks.push(seg(d, 290, 290 - (ten ? 22 : five ? 15 : 9), ten ? 1.2 : 0.7));
+        if (ten && d % 180 !== 0 && d !== 90) this.guides.push(seg(d, 46, 196, 0.9));
+        if (ten) {
+          const lift = p => d % 180 === 0 ? { ...p, py: +((p.y - 12) / 3.6).toFixed(3) } : p;
+          this.labels.push({ ...lift(this.pt(d, 250)), t: String(180 - d), rot: 90 - d });
+          if (d !== 90) this.innerLabels.push({ ...lift(this.pt(d, 212)), t: String(d), rot: 90 - d });
+        }
+      }
+    }
+    const { a, b } = this.state;
+    const lo = Math.min(a, b), ang = Math.abs(b - a);
+    const types = ang === 0 ? ['Zero angle', '#e4e7ec', 'Both arms point the same way: exactly 0°.']
+      : ang < 90 ? ['Acute', '#cfe8d6', 'Less than 90°.']
+      : ang === 90 ? ['Right angle', '#f0c958', 'Exactly 90°: a square corner.']
+      : ang < 180 ? ['Obtuse', '#d6e3f7', 'More than 90° but less than 180°.']
+      : ['Straight angle', '#f6c9c4', 'Exactly 180°: a straight line.'];
+    const r = 64, s = this.pt(lo, r), e = this.pt(lo + ang, r);
+    const sectorPath = ang === 0 ? '' : `M320 330 L${s.x} ${s.y} A${r} ${r} 0 0 0 ${e.x} ${e.y} Z`;
+    const m1 = this.pt(lo, 26), m2 = this.pt(lo + 90, 26), mc = this.pt(lo + 45, 26 * Math.SQRT2);
+    const arm = d => this.pt(d, 322);
+    return {
+      svgRef: this.svgRef,
+      ticks: this.ticks, guides: this.guides, labels: this.labels, innerLabels: this.innerLabels,
+      showInner: this.props.showInnerScale ?? true,
+      a: arm(a), b: arm(b),
+      startA: this.start('a'), startB: this.start('b'),
+      angleText: ang + '°',
+      quiz: this.state.quiz,
+      showAnswer: !this.state.quiz || this.state.revealed,
+      hideAnswer: this.state.quiz && !this.state.revealed,
+      sectorFill: this.state.quiz && !this.state.revealed ? '#e4e7ec' : types[1],
+      showRightMark: ang === 90 && (!this.state.quiz || this.state.revealed),
+      quizLabel: this.state.quiz ? 'Exit quiz' : 'Quiz',
+      quizBg: this.state.quiz ? '#18212f' : '#fff',
+      quizColor: this.state.quiz ? '#fff' : '#18212f',
+      revealLabel: this.state.revealed ? 'Hide answer' : 'Answer key',
+      toggleQuiz: () => this.setState(s => ({ quiz: !s.quiz, revealed: false })),
+      toggleReveal: () => this.setState(s => ({ revealed: !s.revealed })),
+      typeName: types[0], typeBg: types[1], typeRule: types[2],
+      sectorPath, isRight: ang === 90,
+      rightMark: `M${m1.x} ${m1.y} L${mc.x} ${mc.y} L${m2.x} ${m2.y}`,
+      arcLabel: this.pt(lo + ang / 2, 100)
+    };
+  }
+}
+</script>
+</body>
+</html>

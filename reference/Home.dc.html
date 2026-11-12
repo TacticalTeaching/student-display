@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet"><style>
+body{margin:0;min-height:100vh;color:#18212f;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:#f8f8f6}
+body::before{content:"";position:fixed;inset:0;z-index:-1;opacity:.5;background-image:linear-gradient(rgba(74,124,190,.28) 1px,transparent 1px),linear-gradient(90deg,rgba(74,124,190,.28) 1px,transparent 1px);background-size:28px 28px}
+a{color:#18212f;text-decoration:none}a:hover{color:#0f5949}
+</style></helmet>
+<div style="width:min(1100px,calc(100% - 32px));margin:0 auto;padding:44px 0 56px">
+  <header style="display:flex;align-items:center;gap:16px;margin-bottom:48px">
+    <a href="Student Home.dc.html" title="Home" style="height:58px;padding:0 22px;border:2px solid #18212f;border-radius:8px;display:grid;place-items:center;background:#f0c958;font-size:1.1rem;font-weight:950">Home</a>
+    <a href="Student Home.dc.html" title="Back" style="height:58px;padding:0 22px;border:2px solid #18212f;border-radius:8px;display:grid;place-items:center;background:#f0c958;font-size:1.1rem;font-weight:950">Back</a>
+    <h1 style="margin:0;font-size:clamp(2rem,4vw,3rem);line-height:.98;font-family:'Caveat',cursive;color:#c0392b">Operations</h1>
+  </header>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px">
+    <a href="Addition Workout.dc.html" style="border:2px solid #18212f;border-radius:8px;background:rgba(255,255,255,.94);min-height:64px;padding:12px;display:grid;place-items:center;transition:transform 140ms ease" style-hover="transform:translateY(-3px)">
+      <div style="font-size:1.35rem;font-weight:950">Addition</div>
+    </a>
+    <a href="Subtraction Workout.dc.html" style="border:2px solid #18212f;border-radius:8px;background:rgba(255,255,255,.94);min-height:64px;padding:12px;display:grid;place-items:center;transition:transform 140ms ease" style-hover="transform:translateY(-3px)">
+      <div style="font-size:1.35rem;font-weight:950">Subtraction</div>
+    </a>
+    <a href="uploads/multiplication-generator-index.html" style="border:2px solid #18212f;border-radius:8px;background:rgba(255,255,255,.94);min-height:64px;padding:12px;display:grid;place-items:center;transition:transform 140ms ease" style-hover="transform:translateY(-3px)">
+      <div style="font-size:1.35rem;font-weight:950">Multiplication</div>
+    </a>
+    <a href="Division Workout.dc.html" style="border:2px solid #18212f;border-radius:8px;background:rgba(255,255,255,.94);min-height:64px;padding:12px;display:grid;place-items:center;transition:transform 140ms ease" style-hover="transform:translateY(-3px)">
+      <div style="font-size:1.35rem;font-weight:950">Long Division</div>
+    </a>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

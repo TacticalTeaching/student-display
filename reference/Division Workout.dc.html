@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><style>
+body{margin:0;min-height:100vh;color:#18212f;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:linear-gradient(130deg,rgba(240,201,88,.22),transparent 32%),linear-gradient(230deg,rgba(49,95,159,.13),transparent 34%),#f7f5ed}
+body::before{content:"";position:fixed;inset:0;z-index:-1;opacity:.62;background-image:linear-gradient(rgba(24,33,47,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(24,33,47,.055) 1px,transparent 1px);background-size:32px 32px;mask-image:linear-gradient(to bottom,#000 0%,transparent 82%)}
+a{color:#315f9f}a:hover{color:#0f5949}
+</style></helmet>
+<div style="width:min(1180px,calc(100% - 32px));margin:0 auto;padding:28px 0 40px">
+  <header style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:end;margin-bottom:20px">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="width:58px;height:58px;border:2px solid #18212f;border-radius:8px;display:grid;place-items:center;background:#f0c958;box-shadow:7px 7px 0 #18212f;font-size:1.75rem;font-weight:950" aria-hidden="true">÷</div>
+      <h1 style="margin:0;font-size:clamp(2rem,5vw,4.3rem);line-height:.98">Long Division Workout</h1>
+    </div>
+    <div style="justify-self:end;display:flex;gap:10px;align-items:center">
+      <a href="Home.dc.html" style="padding:12px 14px;border:1px solid #d8ddd8;border-radius:8px;background:rgba(255,255,255,.78);font-weight:850;white-space:nowrap;text-decoration:none;color:#315f9f">← Home</a>
+      <div style="padding:12px 14px;border:1px solid #d8ddd8;border-radius:8px;background:rgba(255,255,255,.78);color:#0f5949;font-weight:850;white-space:nowrap">Concrete written method</div>
+    </div>
+  </header>
+  <main style="display:grid;grid-template-columns:300px minmax(0,1fr);gap:22px;align-items:start">
+    <aside style="border:1px solid #d8ddd8;border-radius:8px;background:rgba(255,255,255,.94);box-shadow:0 22px 64px rgba(28,36,48,.14);padding:14px" aria-label="Choose a level">
+      <h2 style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px;color:#647184;font-size:.78rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase">Choose Level <span>{{ qBadge }}</span></h2>
+      <div style="display:grid;gap:8px">
+        <sc-for list="{{ levels }}" as="lv" hint-placeholder-count="3">
+          <button type="button" style="{{ lv.style }}" onClick="{{ lv.onPick }}">
+            <span style="font-size:.96rem;font-weight:950">{{ lv.name }}: {{ lv.title }}</span>
+            <span style="color:#647184;font-size:.86rem;line-height:1.35;font-weight:500">{{ lv.detail }}</span>
+          </button>
+        </sc-for>
+      </div>
+    </aside>
+    <section style="border:1px solid #d8ddd8;border-radius:8px;background:rgba(255,255,255,.94);box-shadow:0 22px 64px rgba(28,36,48,.14);overflow:hidden" aria-live="polite">
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center;padding:16px 18px;border-bottom:1px solid #d8ddd8;background:linear-gradient(90deg,rgba(23,123,99,.12),transparent),#fbfdfb">
+        <div>
+          <div style="font-weight:950;color:#0f5949">{{ levelLabel }}</div>
+          <div style="color:#647184;font-size:.86rem;line-height:1.35">{{ levelDetail }}</div>
+        </div>
+        <div style="color:#315f9f;font-weight:950">{{ qLabel }}</div>
+      </div>
+      <div style="padding:clamp(18px,4vw,34px);display:grid;grid-template-columns:minmax(300px,1fr) minmax(240px,320px);gap:24px;align-items:start">
+        <div style="border:2px solid #18212f;border-radius:8px;background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(255,253,247,.98));padding:clamp(18px,5vw,34px);overflow-x:auto">
+          <div style="width:max-content;margin:0 auto;display:grid;gap:8px" aria-label="Long division working">
+            <sc-for list="{{ rows }}" as="row" hint-placeholder-count="8">
+              <sc-if value="{{ row.rule }}" hint-placeholder-val="{{ false }}">
+                <div style="{{ row.style }}"></div>
+              </sc-if>
+              <sc-if value="{{ row.cells }}" hint-placeholder-val="{{ true }}">
+                <div style="{{ row.style }}">
+                  <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="5">
+                    <button type="button" style="{{ c.style }}" onClick="{{ c.onClick }}" disabled="{{ c.disabled }}">{{ c.text }}</button>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </sc-for>
+          </div>
+        </div>
+        <aside style="display:grid;gap:12px" aria-label="Question controls">
+          <div style="border:1px solid #d8ddd8;border-radius:8px;background:#fbfdfb;padding:14px;display:grid;gap:8px">
+            <div style="color:#647184;font-size:.75rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase">Question</div>
+            <div style="font-size:clamp(1.4rem,4vw,2.2rem);font-weight:950;color:#0f5949;font-family:'Trebuchet MS',sans-serif">{{ questionText }}</div>
+          </div>
+          <div style="border:1px solid #d8ddd8;border-radius:8px;background:#fbfdfb;padding:14px;display:grid;gap:8px">
+            <div style="color:#647184;font-size:.75rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase">Layout</div>
+            <div style="color:#647184;font-size:.86rem;line-height:1.35">Quotient on top in green. Below the bar: multiply (blue), subtract, bring the next digit down — repeat until the remainder is 0.</div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px">
+            <button type="button" onClick="{{ onCalc }}" style="border:0;border-radius:8px;min-height:48px;padding:0 18px;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:#177b63;font-weight:950;font-size:1rem;cursor:pointer;font-family:inherit" style-hover="background:#0f5949;transform:translateY(-1px)">{{ calcLabel }}</button>
+            <button type="button" onClick="{{ onNext }}" style="border:0;border-radius:8px;min-height:48px;padding:0 18px;display:inline-flex;align-items:center;justify-content:center;color:#18212f;background:#f0c958;font-weight:950;font-size:1rem;cursor:pointer;font-family:inherit" style-hover="background:#e8ba43;transform:translateY(-1px)">Next question</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;cellSize&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:56,&quot;min&quot;:44,&quot;max&quot;:72,&quot;step&quot;:2,&quot;unit&quot;:&quot;px&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Board&quot;},&quot;freeReveal&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behaviour&quot;}}">
+class Component extends DCLogic {
+  static LEVELS = [
+    { id: 1, name: "Level 01", title: "2 digit ÷ 1 digit", detail: "Divide, multiply, subtract, bring down. One or two quotient digits, no remainder.", dDigits: 2, vMin: 2, vMax: 9 },
+    { id: 2, name: "Level 02", title: "2 digit ÷ 1 digit, remainder", detail: "Same as Level 01, but the answer has a remainder — written as r beside the quotient.", dDigits: 2, vMin: 2, vMax: 9, remainder: true },
+    { id: 3, name: "Level 03", title: "3 digit ÷ 1 digit", detail: "Three-digit dividend shared by a single digit. Work left to right, no remainder.", dDigits: 3, vMin: 2, vMax: 9 },
+    { id: 4, name: "Level 04", title: "3 digit ÷ 1 digit, remainder", detail: "Three-digit dividends with a single-digit divisor, and a remainder left at the end.", dDigits: 3, vMin: 2, vMax: 9, remainder: true },
+    { id: 5, name: "Level 05", title: "3 digit ÷ 2 digit, remainder", detail: "A two-digit divisor: estimate each quotient digit, multiply and subtract, with a remainder left at the end.", dDigits: 3, vMin: 11, vMax: 24, remainder: true }
+  ];
+  static rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+  static make(level) {
+    const v = Component.rand(level.vMin, level.vMax);
+    const lo = 10 ** (level.dDigits - 1), hi = 10 ** level.dDigits - 1;
+    if (level.remainder) {
+      let dividend = Component.rand(lo, hi);
+      for (let i = 0; i < 80 && dividend % v === 0; i++) dividend = Component.rand(lo, hi);
+      return { dividend, divisor: v, quotient: Math.floor(dividend / v) };
+    }
+    const q = Component.rand(Math.ceil(lo / v), Math.floor(hi / v));
+    return { dividend: v * q, divisor: v, quotient: q };
+  }
+  state = { levelId: 1, qNum: 1, calculated: false, revealed: {}, current: Component.make(Component.LEVELS[0]) };
+  level() { return Component.LEVELS.find(l => l.id === this.state.levelId); }
+  pick(id) {
+    const lv = Component.LEVELS.find(l => l.id === id);
+    this.setState({ levelId: id, qNum: 1, current: Component.make(lv), calculated: false, revealed: {} });
+  }
+  renderVals() {
+    const CS = this.props.cellSize ?? 56;
+    const free = this.props.freeReveal ?? false;
+    const { current, calculated, revealed, qNum, levelId } = this.state;
+    const lvl = this.level();
+    const dig = x => String(x).split("").map(Number);
+    const D = dig(current.dividend), n = D.length, v = current.divisor;
+    const steps = [];
+    let r = 0, started = false;
+    for (let i = 0; i < n; i++) {
+      const cur = r * 10 + D[i];
+      if (!started && cur < v && i < n - 1) { r = cur; continue; }
+      started = true;
+      const q = Math.floor(cur / v), sub = q * v;
+      r = cur - sub;
+      steps.push({ i, q, sub, rem: r });
+    }
+    const start = steps[0].i;
+    steps.forEach((s, k) => {
+      s.prod = dig(s.sub);
+      const last = k === steps.length - 1;
+      if (last) { s.remRow = dig(s.rem); s.remEnd = s.i; }
+      else { s.remRow = s.rem === 0 ? dig(D[s.i + 1]) : dig(s.rem * 10 + D[s.i + 1]); s.remEnd = s.i + 1; }
+    });
+    const order = [];
+    for (let i = 0; i < start; i++) order.push("q-" + i);
+    steps.forEach((s, k) => {
+      order.push("q-" + s.i);
+      s.prod.forEach((_, j) => order.push(`p-${k}-${s.i - s.prod.length + 1 + j}`));
+      s.remRow.forEach((_, j) => order.push(`m-${k}-${s.remEnd - s.remRow.length + 1 + j}`));
+    });
+    const finalRem = steps[steps.length - 1].rem;
+    if (finalRem > 0) order.push("rr");
+    const nextId = order.find(id => !revealed[id]) || "";
+    const reveal = id => () => this.setState(s => ({ revealed: { ...s.revealed, [id]: true } }));
+    const base = { width: CS, height: CS, border: "2px solid #18212f", borderRadius: 8, background: "#fff", display: "grid", placeItems: "center", fontSize: CS * 0.54, fontWeight: 900, fontFamily: "'Trebuchet MS',sans-serif", color: "#18212f", padding: 0, lineHeight: 1 };
+    const blank = w => ({ width: w, height: CS, border: "none", background: "transparent", padding: 0 });
+    const mk = (id, val, pal) => {
+      if (!calculated) return { text: "?", style: { ...base, color: "#9da8b4", fontSize: CS * 0.43 }, disabled: true };
+      if (revealed[id]) return { text: String(val), style: { ...base, ...pal }, disabled: true };
+      const isNext = free || id === nextId;
+      return { text: "?", style: { ...base, background: "#f5f8fb", borderColor: isNext ? "#315f9f" : "#8fa0ad", color: "#788797", fontSize: CS * 0.43, boxShadow: isNext ? "0 0 0 3px rgba(49,95,159,.18)" : "none", cursor: isNext ? "pointer" : "not-allowed", opacity: isNext ? 1 : 0.62 }, onClick: isNext ? reveal(id) : undefined, disabled: !isNext };
+    };
+    const quotPal = { background: "#e9f5ef", borderColor: "#0f5949", color: "#0f5949" };
+    const prodPal = { background: "#eef4ff", borderColor: "#315f9f", color: "#315f9f" };
+    const remPal = {};
+    const gridStyle = { display: "grid", gridTemplateColumns: `${CS}px 12px repeat(${n},${CS}px)`, gap: 8, justifyContent: "start" };
+    const OFF = CS + 28;
+    const qDigits = {};
+    for (let i = 0; i < start; i++) qDigits[i] = 0;
+    steps.forEach(s => { qDigits[s.i] = s.q; });
+    const rows = [];
+    const qCells = [{ text: "", style: blank(CS), disabled: true }, { text: "", style: blank(12), disabled: true }].concat(D.map((_, c) => mk("q-" + c, qDigits[c], quotPal)));
+    if (finalRem > 0) {
+      qCells.push({ text: "r", style: { ...blank(CS * 0.5), display: "grid", placeItems: "center", color: "#d96d5c", fontSize: CS * 0.4, fontWeight: 900, fontFamily: "'Trebuchet MS',sans-serif" }, disabled: true });
+      qCells.push(mk("rr", finalRem, { background: "#fff1ed", borderColor: "#d96d5c", color: "#d96d5c" }));
+    }
+    rows.push({ key: "q", style: finalRem > 0 ? { ...gridStyle, gridTemplateColumns: `${CS}px 12px repeat(${n},${CS}px) ${CS * 0.5}px ${CS}px` } : gridStyle, cells: qCells });
+    rows.push({ rule: true, style: { height: 4, borderRadius: 999, background: "#18212f", width: n * CS + n * 8 + 4, marginLeft: CS + 16 } });
+    rows.push({ key: "d", style: gridStyle, cells: [{ text: String(v), style: { ...base, fontSize: v > 9 ? CS * 0.42 : CS * 0.54 }, disabled: true }, { text: "", style: { width: 4, height: CS + 12, marginTop: -12, background: "#18212f", border: "none", borderRadius: 2, padding: 0, justifySelf: "end" }, disabled: true }].concat(D.map(d => ({ text: String(d), style: base, disabled: true }))) });
+    steps.forEach((s, k) => {
+      const pStart = s.i - s.prod.length + 1;
+      rows.push({ key: "p" + k, style: gridStyle, cells: [{ text: "−", style: { ...blank(CS), display: "grid", placeItems: "center", color: "#647184", fontSize: CS * 0.4, fontWeight: 900, fontFamily: "'Trebuchet MS',sans-serif" }, disabled: true }, { text: "", style: blank(12), disabled: true }].concat(D.map((_, c) => (c >= pStart && c <= s.i) ? mk(`p-${k}-${c}`, s.prod[c - pStart], prodPal) : { text: "", style: blank(CS), disabled: true })) });
+      rows.push({ rule: true, style: { height: 4, borderRadius: 999, background: "#18212f", width: (s.i - pStart + 1) * CS + (s.i - pStart) * 8, marginLeft: OFF + pStart * (CS + 8) } });
+      const mStart = s.remEnd - s.remRow.length + 1;
+      rows.push({ key: "m" + k, style: gridStyle, cells: [{ text: "", style: blank(CS), disabled: true }, { text: "", style: blank(12), disabled: true }].concat(D.map((_, c) => (c >= mStart && c <= s.remEnd) ? mk(`m-${k}-${c}`, s.remRow[c - mStart], remPal) : { text: "", style: blank(CS), disabled: true })) });
+    });
+    const levels = Component.LEVELS.map(lv => ({
+      ...lv,
+      onPick: () => this.pick(lv.id),
+      style: { width: "100%", textAlign: "left", cursor: "pointer", display: "grid", gap: 6, padding: 12, borderRadius: 8, font: "inherit", color: "#18212f", border: lv.id === levelId ? "1px solid #177b63" : "1px solid #d8ddd8", background: lv.id === levelId ? "#e8f4ef" : "#fff", boxShadow: lv.id === levelId ? "inset 4px 0 0 #177b63" : "none" }
+    }));
+    return {
+      rows, levels,
+      qBadge: "Q" + qNum,
+      qLabel: "Question " + qNum,
+      levelLabel: `${lvl.name}: ${lvl.title}`,
+      levelDetail: lvl.detail,
+      questionText: `${current.dividend} ÷ ${current.divisor}`,
+      calcLabel: calculated ? "Cover workout" : "Calculate",
+      onCalc: () => this.setState(s => ({ calculated: !s.calculated, revealed: {} })),
+      onNext: () => this.setState(s => ({ qNum: s.qNum + 1, current: Component.make(lvl), calculated: false, revealed: {} }))
+    };
+  }
+}
+</script>
+</body>
+</html>

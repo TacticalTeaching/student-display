@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><style>
+body{margin:0;min-height:100vh;color:#18212f;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:#f8f8f6}
+body::before{content:"";position:fixed;inset:0;z-index:-1;opacity:.5;background-image:linear-gradient(rgba(74,124,190,.28) 1px,transparent 1px),linear-gradient(90deg,rgba(74,124,190,.28) 1px,transparent 1px);background-size:28px 28px}
+a{color:#18212f;text-decoration:none}a:hover{color:#0f5949}
+</style></helmet>
+<div style="width:min(1200px,calc(100% - 32px));margin:0 auto;padding:56px 0;display:grid;gap:36px;justify-items:center">
+  <header style="display:grid;gap:10px;justify-items:center;text-align:center">
+    <h1 style="margin:0;font-size:clamp(1.8rem,4vw,2.6rem);line-height:1">Maths Home</h1>
+  </header>
+  <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;width:100%">
+    <a href="Home.dc.html" style="border:2px solid #18212f;border-radius:24px;background:rgba(255,255,255,.94);min-height:64px;padding:12px;display:grid;place-items:center;transition:transform 140ms ease" style-hover="transform:translateY(-3px)">
+      <div style="font-size:1.5rem;font-weight:950">Operations</div>
+    </a>
+    <a href="#" style="position:relative;overflow:hidden;border:2px solid #18212f;border-radius:24px;background:#f6c9c4;min-height:64px;padding:12px;display:grid;place-items:center;transition:transform 140ms ease" style-hover="transform:translateY(-3px)">
+      <div style="font-size:1.5rem;font-weight:950;color:#647184">Number</div>
+      <div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:66%;opacity:.3;background:repeating-linear-gradient(45deg,#18212f 0 14px,#f0c958 14px 28px);display:grid;place-items:center;pointer-events:none"><span style="background:#f0c958;padding:2px 14px;font-size:.74rem;font-weight:950;letter-spacing:.1em;white-space:nowrap">UNDER CONSTRUCTION</span></div>
+    </a>
+    <a href="#" style="position:relative;overflow:hidden;border:2px solid #18212f;border-radius:24px;background:#f6c9c4;min-height:64px;padding:12px;display:grid;place-items:center;transition:transform 140ms ease" style-hover="transform:translateY(-3px)">
+      <div style="font-size:1.5rem;font-weight:950;color:#647184">Measurement</div>
+      <div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:66%;opacity:.3;background:repeating-linear-gradient(45deg,#18212f 0 14px,#f0c958 14px 28px);display:grid;place-items:center;pointer-events:none"><span style="background:#f0c958;padding:2px 14px;font-size:.74rem;font-weight:950;letter-spacing:.1em;white-space:nowrap">UNDER CONSTRUCTION</span></div>
+    </a>
+    <a href="#" style="position:relative;overflow:hidden;border:2px solid #18212f;border-radius:24px;background:#f6c9c4;min-height:64px;padding:12px;display:grid;place-items:center;transition:transform 140ms ease" style-hover="transform:translateY(-3px)">
+      <div style="font-size:1.5rem;font-weight:950;color:#647184">Geometry</div>
+      <div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:66%;opacity:.3;background:repeating-linear-gradient(45deg,#18212f 0 14px,#f0c958 14px 28px);display:grid;place-items:center;pointer-events:none"><span style="background:#f0c958;padding:2px 14px;font-size:.74rem;font-weight:950;letter-spacing:.1em;white-space:nowrap">UNDER CONSTRUCTION</span></div>
+    </a>
+    <a href="#" style="position:relative;overflow:hidden;border:2px solid #18212f;border-radius:24px;background:#f6c9c4;min-height:64px;padding:12px;display:grid;place-items:center;transition:transform 140ms ease" style-hover="transform:translateY(-3px)">
+      <div style="font-size:1.5rem;font-weight:950;color:#647184">Algebra</div>
+      <div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:66%;opacity:.3;background:repeating-linear-gradient(45deg,#18212f 0 14px,#f0c958 14px 28px);display:grid;place-items:center;pointer-events:none"><span style="background:#f0c958;padding:2px 14px;font-size:.74rem;font-weight:950;letter-spacing:.1em;white-space:nowrap">UNDER CONSTRUCTION</span></div>
+    </a>
+    <a href="#" style="position:relative;overflow:hidden;border:2px solid #18212f;border-radius:24px;background:#f6c9c4;min-height:64px;padding:12px;display:grid;place-items:center;transition:transform 140ms ease" style-hover="transform:translateY(-3px)">
+      <div style="font-size:1.5rem;font-weight:950;color:#647184">Statistics</div>
+      <div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:66%;opacity:.3;background:repeating-linear-gradient(45deg,#18212f 0 14px,#f0c958 14px 28px);display:grid;place-items:center;pointer-events:none"><span style="background:#f0c958;padding:2px 14px;font-size:.74rem;font-weight:950;letter-spacing:.1em;white-space:nowrap">UNDER CONSTRUCTION</span></div>
+    </a>
+    <a href="#" style="position:relative;overflow:hidden;border:2px solid #18212f;border-radius:24px;background:#f6c9c4;min-height:64px;padding:12px;display:grid;place-items:center;transition:transform 140ms ease" style-hover="transform:translateY(-3px)">
+      <div style="font-size:1.5rem;font-weight:950;color:#647184">Probability</div>
+      <div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:66%;opacity:.3;background:repeating-linear-gradient(45deg,#18212f 0 14px,#f0c958 14px 28px);display:grid;place-items:center;pointer-events:none"><span style="background:#f0c958;padding:2px 14px;font-size:.74rem;font-weight:950;letter-spacing:.1em;white-space:nowrap">UNDER CONSTRUCTION</span></div>
+    </a>
+    <a href="#" style="position:relative;overflow:hidden;border:2px solid #18212f;border-radius:24px;background:#f6c9c4;min-height:64px;padding:12px;display:grid;place-items:center;transition:transform 140ms ease" style-hover="transform:translateY(-3px)">
+      <div style="font-size:1.5rem;font-weight:950;color:#647184">Rational Numbers</div>
+      <div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:66%;opacity:.3;background:repeating-linear-gradient(45deg,#18212f 0 14px,#f0c958 14px 28px);display:grid;place-items:center;pointer-events:none"><span style="background:#f0c958;padding:2px 14px;font-size:.74rem;font-weight:950;letter-spacing:.1em;white-space:nowrap">UNDER CONSTRUCTION</span></div>
+    </a>
+    <a href="#" style="position:relative;overflow:hidden;border:2px solid #18212f;border-radius:24px;background:#f6c9c4;min-height:64px;padding:12px;display:grid;place-items:center;transition:transform 140ms ease" style-hover="transform:translateY(-3px)">
+      <div style="font-size:1.5rem;font-weight:950;color:#647184">Basic Facts</div>
+      <div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:66%;opacity:.3;background:repeating-linear-gradient(45deg,#18212f 0 14px,#f0c958 14px 28px);display:grid;place-items:center;pointer-events:none"><span style="background:#f0c958;padding:2px 14px;font-size:.74rem;font-weight:950;letter-spacing:.1em;white-space:nowrap">UNDER CONSTRUCTION</span></div>
+    </a>
+    <a href="Vocabulary.dc.html" style="position:relative;overflow:hidden;border:2px solid #18212f;border-radius:24px;background:#f6c9c4;min-height:64px;padding:12px;display:grid;place-items:center;transition:transform 140ms ease" style-hover="transform:translateY(-3px)">
+      <div style="font-size:1.5rem;font-weight:950;color:#647184">Vocabulary</div>
+      <div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:66%;opacity:.3;background:repeating-linear-gradient(45deg,#18212f 0 14px,#f0c958 14px 28px);display:grid;place-items:center;pointer-events:none"><span style="background:#f0c958;padding:2px 14px;font-size:.74rem;font-weight:950;letter-spacing:.1em;white-space:nowrap">UNDER CONSTRUCTION</span></div>
+    </a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { flipped: false };
+  renderVals() {
+    return {
+      vocabWord: "Regroup",
+      vocabMeaning: "To exchange 10 in one place-value column for 1 in the next column (or the other way around).",
+      vocabExample: "Example: 8 + 7 = 15, so write 5 in the ones and carry 1 to the tens.",
+      vocabFront: !this.state.flipped,
+      vocabBack: this.state.flipped,
+      vocabBg: this.state.flipped ? "#e8f4ef" : "rgba(255,255,255,.94)",
+      onFlipVocab: () => this.setState(s => ({ flipped: !s.flipped }))
+    };
+  }
+}
+</script>
+</body>
+</html>

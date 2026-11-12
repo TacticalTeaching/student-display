@@ -1,0 +1,976 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Multiplication Workout</title>
+  <style>
+    :root {
+      --ink: #18212f;
+      --muted: #647184;
+      --paper: #f7f5ed;
+      --panel: #ffffff;
+      --line: #d8ddd8;
+      --soft: #eef4f1;
+      --green: #177b63;
+      --green-dark: #0f5949;
+      --blue: #315f9f;
+      --yellow: #f0c958;
+      --coral: #d96d5c;
+      --shadow: 0 22px 64px rgba(28, 36, 48, 0.14);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        linear-gradient(130deg, rgba(240, 201, 88, 0.22), transparent 32%),
+        linear-gradient(230deg, rgba(49, 95, 159, 0.13), transparent 34%),
+        var(--paper);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      opacity: 0.62;
+      background-image:
+        linear-gradient(rgba(24, 33, 47, 0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(24, 33, 47, 0.055) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: linear-gradient(to bottom, #000 0%, transparent 82%);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .app {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 40px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .mark {
+      width: 58px;
+      height: 58px;
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      background: var(--yellow);
+      box-shadow: 7px 7px 0 var(--ink);
+      font-size: 1.75rem;
+      font-weight: 950;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 4.3rem);
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    .tagline {
+      margin: 8px 0 0;
+      max-width: 68ch;
+      color: var(--muted);
+      font-size: 1.03rem;
+      line-height: 1.45;
+    }
+
+    .teacher-chip {
+      justify-self: end;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.78);
+      color: var(--green-dark);
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .levels,
+    .workspace {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: var(--shadow);
+    }
+
+    .levels {
+      padding: 14px;
+      position: sticky;
+      top: 18px;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .level-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .level-button {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: 12px;
+      text-align: left;
+      color: var(--ink);
+      cursor: pointer;
+      display: grid;
+      gap: 6px;
+      transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+    }
+
+    .level-button:hover,
+    .level-button:focus-visible {
+      transform: translateY(-1px);
+      border-color: var(--green);
+      outline: none;
+    }
+
+    .level-button.active {
+      background: #e8f4ef;
+      border-color: var(--green);
+      box-shadow: inset 4px 0 0 var(--green);
+    }
+
+    .level-name {
+      font-size: 0.96rem;
+      font-weight: 950;
+    }
+
+    .level-detail {
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.35;
+    }
+
+    .stage {
+      display: grid;
+      gap: 16px;
+    }
+
+    .workspace {
+      overflow: hidden;
+    }
+
+    .top-strip {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(90deg, rgba(23, 123, 99, 0.12), transparent),
+        #fbfdfb;
+    }
+
+    .level-label {
+      font-weight: 950;
+      color: var(--green-dark);
+    }
+
+    .question-count {
+      color: var(--blue);
+      font-weight: 950;
+    }
+
+    .worksheet {
+      padding: clamp(18px, 4vw, 34px);
+      display: grid;
+      grid-template-columns: minmax(300px, 1fr) minmax(240px, 320px);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .algorithm-card {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 253, 247, 0.98)),
+        repeating-linear-gradient(0deg, transparent 0 35px, rgba(24, 33, 47, 0.055) 36px 37px);
+      padding: clamp(18px, 5vw, 34px);
+      overflow-x: auto;
+    }
+
+    .work-grid {
+      --cell: clamp(46px, 8vw, 66px);
+      --gap: 8px;
+      width: max-content;
+      min-width: 100%;
+      display: grid;
+      grid-template-columns: repeat(var(--cols), var(--cell));
+      grid-auto-rows: auto;
+      justify-content: end;
+      gap: var(--gap);
+      font-family: "Trebuchet MS", Inter, sans-serif;
+    }
+
+    .carry-cell,
+    .digit-cell,
+    .operator-cell,
+    .blank-cell {
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius);
+      font-weight: 950;
+      line-height: 1;
+    }
+
+    .carry-cell {
+      width: calc(var(--cell) / 2);
+      justify-self: start;
+      transform: translateY(0.1em);
+      height: 28px;
+      border: 1.5px dashed #9cacb7;
+      background: #f9fbfd;
+      color: var(--coral);
+      font-size: 1rem;
+      padding-top: 0.05em;
+    }
+
+    .reveal-cell {
+      cursor: pointer;
+      position: relative;
+      padding: 0;
+      transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
+    }
+
+    .reveal-cell:hover,
+    .reveal-cell:focus-visible {
+      outline: 3px solid rgba(49, 95, 159, 0.18);
+    }
+
+    .digit-cell.reveal-cell:hover,
+    .digit-cell.reveal-cell:focus-visible {
+      transform: translateY(-1px);
+    }
+
+    .carry-cell.reveal-cell:hover,
+    .carry-cell.reveal-cell:focus-visible {
+      transform: translateY(0.1em);
+    }
+
+    .reveal-cell.covered {
+      color: transparent;
+      background:
+        linear-gradient(135deg, rgba(49, 95, 159, 0.18), rgba(23, 123, 99, 0.12)),
+        #f5f8fb;
+      border-color: #8fa0ad;
+    }
+
+    .reveal-cell.locked {
+      cursor: not-allowed;
+      opacity: 0.62;
+    }
+
+    .reveal-cell.next {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(49, 95, 159, 0.18);
+    }
+
+    .reveal-cell.covered::after {
+      content: "?";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: #788797;
+      font-weight: 950;
+    }
+
+    .carry-cell.reveal-cell.covered::after {
+      font-size: 0.92rem;
+    }
+
+    .carry-cell.crossed {
+      color: #97a1aa;
+      border-color: #b8c0c7;
+      background: #f1f3f5;
+    }
+
+    .carry-cell.crossed::before {
+      content: "";
+      position: absolute;
+      left: 5px;
+      right: 5px;
+      top: calc(50% - 1.5px);
+      height: 3px;
+      border-radius: 999px;
+      background: var(--coral);
+      opacity: 0.9;
+      transform: rotate(-34deg);
+      transform-origin: center;
+    }
+
+    .carry-cell.visible {
+      border-style: solid;
+      border-color: var(--coral);
+      background: #fff1ed;
+    }
+
+    .digit-cell {
+      width: var(--cell);
+      height: var(--cell);
+      border: 2px solid var(--ink);
+      background: #fff;
+      font-size: clamp(2rem, 7vw, 3.2rem);
+    }
+
+    .digit-cell.answer {
+      background: #e9f5ef;
+      border-color: var(--green-dark);
+      color: var(--green-dark);
+    }
+
+    .digit-cell.partial {
+      background: #eef4ff;
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    .operator-cell {
+      height: var(--cell);
+      color: var(--green-dark);
+      font-size: clamp(1.8rem, 6vw, 3rem);
+      align-self: end;
+    }
+
+    .blank-cell {
+      min-height: 28px;
+    }
+
+    .rule-line,
+    .final-line {
+      grid-column: 1 / -1;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--ink);
+      margin: 5px 0 2px;
+    }
+
+    .final-line {
+      background: var(--green-dark);
+    }
+
+    .placeholder {
+      color: #9da8b4;
+      font-size: clamp(1.5rem, 5vw, 2.4rem);
+    }
+
+    .side-panel {
+      display: grid;
+      gap: 12px;
+    }
+
+    .fact-box {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fbfdfb;
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .fact-label {
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .fact-value {
+      font-size: clamp(1.4rem, 4vw, 2.2rem);
+      font-weight: 950;
+      color: var(--green-dark);
+      font-family: "Trebuchet MS", Inter, sans-serif;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .action-button {
+      border: 0;
+      border-radius: var(--radius);
+      min-height: 48px;
+      padding: 0 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      color: #fff;
+      background: var(--green);
+      font-weight: 950;
+      cursor: pointer;
+      transition: transform 140ms ease, background 140ms ease;
+    }
+
+    .action-button:hover,
+    .action-button:focus-visible {
+      transform: translateY(-1px);
+      background: var(--green-dark);
+      outline: 3px solid rgba(23, 123, 99, 0.2);
+    }
+
+    .action-button.secondary {
+      color: var(--ink);
+      background: var(--yellow);
+    }
+
+    .action-button.secondary:hover,
+    .action-button.secondary:focus-visible {
+      background: #e8ba43;
+      outline-color: rgba(240, 201, 88, 0.28);
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      body::before,
+      .levels,
+      .actions {
+        display: none;
+      }
+
+      .app {
+        width: 100%;
+        padding: 0;
+      }
+
+      header,
+      main,
+      .worksheet {
+        display: block;
+      }
+
+      .workspace,
+      .algorithm-card {
+        box-shadow: none;
+      }
+    }
+
+    @media (max-width: 900px) {
+      header,
+      main,
+      .top-strip,
+      .worksheet {
+        grid-template-columns: 1fr;
+      }
+
+      .teacher-chip {
+        justify-self: start;
+      }
+
+      .levels {
+        position: static;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .app {
+        width: min(100% - 22px, 1180px);
+        padding-top: 18px;
+      }
+
+      .brand {
+        align-items: flex-start;
+      }
+
+      .mark {
+        width: 48px;
+        height: 48px;
+        box-shadow: 5px 5px 0 var(--ink);
+      }
+
+      .worksheet {
+        padding: 14px;
+      }
+
+      .algorithm-card {
+        padding: 16px 12px;
+      }
+
+      .action-button {
+        flex: 1 1 150px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand">
+        <div class="mark" aria-hidden="true">×</div>
+        <div>
+          <h1>Multiplication Workout</h1>
+        </div>
+      </div>
+      <div style="justify-self:end;display:flex;gap:10px;align-items:center">
+        <a href="../Home.dc.html" class="teacher-chip" style="text-decoration:none;color:#315f9f">← Home</a>
+        <div class="teacher-chip" style="justify-self:auto">Concrete written method</div>
+      </div>
+    </header>
+
+    <main>
+      <aside class="levels" aria-label="Choose a level">
+        <h2 class="panel-title">Choose Level <span id="questionNumber">Q1</span></h2>
+        <div id="levelList" class="level-list"></div>
+      </aside>
+
+      <section class="stage" aria-live="polite">
+        <div class="workspace">
+          <div class="top-strip">
+            <div>
+              <div id="levelLabel" class="level-label"></div>
+              <div id="levelRule" class="level-detail"></div>
+            </div>
+            <div class="question-count" id="questionCounter">Question 1</div>
+          </div>
+
+          <div class="worksheet">
+            <div class="algorithm-card">
+              <div id="workGrid" class="work-grid" aria-label="Column multiplication working"></div>
+            </div>
+
+            <aside class="side-panel" aria-label="Question controls">
+              <div class="fact-box">
+                <div class="fact-label">Question</div>
+                <div id="questionText" class="fact-value"></div>
+              </div>
+              <div class="fact-box">
+                <div class="fact-label">Layout</div>
+                <div id="layoutHint" class="level-detail"></div>
+              </div>
+              <div class="actions">
+                <button id="showWorkout" class="action-button" type="button">Show workout</button>
+                <button id="nextQuestion" class="action-button secondary" type="button">Next question</button>
+              </div>
+            </aside>
+          </div>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const LEVELS = [
+      {
+        id: 1,
+        name: "Level 01",
+        title: "1 digit × 2 digit",
+        detail: "Two working lines: one line for multiplying and one final answer line.",
+        topDigits: 2,
+        bottomDigits: 1
+      },
+      {
+        id: 2,
+        name: "Level 02",
+        title: "1 digit × 3 digit",
+        detail: "Two working lines: one line for multiplying and one final answer line.",
+        topDigits: 3,
+        bottomDigits: 1
+      },
+      {
+        id: 3,
+        name: "Level 03",
+        title: "2 digit × 3 digit",
+        detail: "One line, two partial-product rows, then the final total line.",
+        topDigits: 3,
+        bottomDigits: 2
+      }
+    ];
+
+    const state = {
+      level: LEVELS[0],
+      questionCount: 1,
+      current: null,
+      calculated: false,
+      revealedCells: new Set()
+    };
+
+    const elements = {
+      levelList: document.getElementById("levelList"),
+      levelLabel: document.getElementById("levelLabel"),
+      levelRule: document.getElementById("levelRule"),
+      questionCounter: document.getElementById("questionCounter"),
+      questionNumber: document.getElementById("questionNumber"),
+      questionText: document.getElementById("questionText"),
+      layoutHint: document.getElementById("layoutHint"),
+      workGrid: document.getElementById("workGrid"),
+      showWorkout: document.getElementById("showWorkout"),
+      nextQuestion: document.getElementById("nextQuestion")
+    };
+
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function digitsOf(number) {
+      return String(number).split("").map(Number);
+    }
+
+    function padLeft(items, length, fill = "") {
+      return Array.from({ length: Math.max(0, length - items.length) }, () => fill).concat(items);
+    }
+
+    function numberWithDigits(count) {
+      const min = 10 ** (count - 1);
+      const max = 10 ** count - 1;
+      return randomInt(min, max);
+    }
+
+    function oneDigitMultiplier() {
+      return randomInt(2, 9);
+    }
+
+    function makeQuestion(level) {
+      const top = numberWithDigits(level.topDigits);
+      const bottom = level.bottomDigits === 1 ? oneDigitMultiplier() : numberWithDigits(2);
+      const topDigits = digitsOf(top);
+      const bottomDigits = digitsOf(bottom);
+      const answer = top * bottom;
+
+      return {
+        top,
+        bottom,
+        topDigits,
+        bottomDigits,
+        answer,
+        onesMultiplier: bottomDigits[bottomDigits.length - 1],
+        tensMultiplier: level.bottomDigits === 2 ? bottomDigits[0] : null
+      };
+    }
+
+    function singleDigitWork(topDigits, multiplier) {
+      const answerDigits = [];
+      const carries = Array(topDigits.length).fill("");
+      const notes = [];
+      let carry = 0;
+
+      for (let i = topDigits.length - 1; i >= 0; i--) {
+        const raw = topDigits[i] * multiplier + carry;
+        const isLeftmost = i === 0;
+        const written = isLeftmost ? String(raw) : String(raw % 10);
+        const carryOut = isLeftmost ? 0 : Math.floor(raw / 10);
+        const carryText = carry ? ` + ${carry}` : "";
+        const writeText = isLeftmost ? `write ${raw}` : `write ${raw % 10}`;
+        const carryOutText = carryOut ? `, regroup ${carryOut}` : "";
+
+        notes.unshift(`${topDigits[i]} × ${multiplier}${carryText} = ${raw}; ${writeText}${carryOutText}.`);
+        answerDigits.unshift(...digitsOf(Number(written)));
+
+        if (carryOut) carries[i - 1] = carryOut;
+        carry = carryOut;
+      }
+
+      return {
+        answerDigits,
+        carries,
+        notes
+      };
+    }
+
+    function placeRow(items, cols, className, offsetFromRight = 0) {
+      const padded = Array(cols).fill({ text: "", className: "blank-cell" });
+      const end = cols - offsetFromRight;
+      const start = end - items.length;
+
+      items.forEach((text, index) => {
+        const col = start + index;
+        if (col >= 0 && col < cols) {
+          padded[col] = { text, className };
+        }
+      });
+
+      return padded;
+    }
+
+    function cell(text, className, revealed = true, revealId = "", nextRevealId = "") {
+      const hasText = text !== "" && text !== null && text !== undefined;
+      const isRevealable = Boolean(revealId && hasText);
+      const isCovered = isRevealable && state.calculated && !revealed;
+      const visibleText = revealed && hasText ? String(text) : "";
+      const placeholder = !state.calculated && !revealed && className.includes("digit-cell") ? "<span class=\"placeholder\">?</span>" : "";
+      const visibleClass = hasText && revealed && className.includes("carry-cell") ? " visible" : "";
+      const nextClass = isCovered && revealId === nextRevealId ? " next" : "";
+      const lockedClass = isCovered && revealId !== nextRevealId ? " locked" : "";
+      const disabledAttribute = isCovered && revealId !== nextRevealId ? " disabled" : "";
+
+      if (isRevealable && state.calculated) {
+        const label = isCovered ? "Reveal next covered square" : `Revealed ${text}`;
+        return `<button class="${className} reveal-cell${visibleClass}${isCovered ? " covered" : ""}${nextClass}${lockedClass}" type="button" data-reveal-id="${revealId}" aria-label="${label}"${disabledAttribute}>${visibleText}</button>`;
+      }
+
+      return `<div class="${className}${visibleClass}">${visibleText || placeholder}</div>`;
+    }
+
+    function renderRow(row, nextRevealId = "") {
+      return row.map(item => cell(item.text, item.className, item.revealed, item.revealId, nextRevealId)).join("");
+    }
+
+    function renderRule(className = "rule-line") {
+      return `<div class="${className}"></div>`;
+    }
+
+    function hasCellText(item) {
+      return item.text !== "" && item.text !== null && item.text !== undefined;
+    }
+
+    function addWorkingOrder(sequence, digitPrefix, digitRow, carryPrefix, carryRow) {
+      for (let col = digitRow.length - 1; col >= 0; col--) {
+        if (hasCellText(digitRow[col])) sequence.push(`${digitPrefix}-${col}`);
+
+        const carryCol = col - 1;
+        if (carryCol >= 0 && carryRow && hasCellText(carryRow[carryCol])) {
+          sequence.push(`${carryPrefix}-${carryCol}`);
+        }
+      }
+    }
+
+    function additionCarries(rowA, rowB) {
+      const carries = Array(rowA.length).fill("");
+      let carry = 0;
+
+      for (let col = rowA.length - 1; col >= 0; col--) {
+        const top = hasCellText(rowA[col]) ? Number(rowA[col].text) : 0;
+        const bottom = hasCellText(rowB[col]) ? Number(rowB[col].text) : 0;
+        const total = top + bottom + carry;
+        const nextCarry = col === 0 ? 0 : Math.floor(total / 10);
+
+        if (nextCarry) carries[col - 1] = nextCarry;
+        carry = nextCarry;
+      }
+
+      return carries;
+    }
+
+    function nextRevealId(sequence) {
+      return sequence.find(id => !state.revealedCells.has(id)) || "";
+    }
+
+    function renderGrid() {
+      const current = state.current;
+      const onesWork = singleDigitWork(current.topDigits, current.onesMultiplier);
+      const tensWork = current.tensMultiplier === null ? null : singleDigitWork(current.topDigits, current.tensMultiplier);
+      const answerDigits = digitsOf(current.answer);
+      const partialOnes = current.top * current.onesMultiplier;
+      const partialTens = current.tensMultiplier === null ? null : current.top * current.tensMultiplier;
+      const partialOnesDigits = digitsOf(partialOnes);
+      const partialTensDigits = partialTens === null ? [] : digitsOf(partialTens);
+      const columns = Math.max(
+        current.topDigits.length + 1,
+        answerDigits.length,
+        partialOnesDigits.length,
+        partialTensDigits.length + 1,
+        current.bottomDigits.length + 1
+      );
+
+      elements.workGrid.style.setProperty("--cols", columns);
+
+      const onesCarryRow = placeRow(onesWork.carries, columns, "carry-cell");
+      const tensCarryRow = tensWork ? placeRow(tensWork.carries, columns, "carry-cell") : [];
+      const topRow = placeRow(current.topDigits, columns, "digit-cell");
+      const bottomDigits = placeRow(current.bottomDigits, columns, "digit-cell");
+      bottomDigits[columns - current.bottomDigits.length - 1] = { text: "×", className: "operator-cell" };
+      const revealOrder = [];
+
+      let html = "";
+
+      if (state.level.id < 3) {
+        const workingRow = placeRow(answerDigits, columns, "digit-cell answer");
+        addWorkingOrder(revealOrder, "answer", workingRow, "carry", onesCarryRow);
+        const nextId = nextRevealId(revealOrder);
+
+        html += renderRow(onesCarryRow.map((item, index) => ({
+          ...item,
+          revealed: state.revealedCells.has(`carry-${index}`),
+          revealId: hasCellText(item) ? `carry-${index}` : ""
+        })), nextId);
+        html += renderRow(topRow.map(item => ({ ...item, revealed: true })), nextId);
+        html += renderRow(bottomDigits.map(item => ({ ...item, revealed: true })), nextId);
+        html += renderRule("rule-line");
+        html += renderRow(workingRow.map((item, index) => ({
+          ...item,
+          revealed: state.revealedCells.has(`answer-${index}`),
+          revealId: hasCellText(item) ? `answer-${index}` : ""
+        })), nextId);
+        html += renderRule("final-line");
+      } else {
+        const onesRow = placeRow(partialOnesDigits, columns, "digit-cell partial");
+        const tensRow = placeRow(partialTensDigits.concat(0), columns, "digit-cell partial");
+        const answerRow = placeRow(answerDigits, columns, "digit-cell answer");
+        const answerCarryRow = placeRow(additionCarries(onesRow, tensRow), columns, "carry-cell");
+        addWorkingOrder(revealOrder, "ones", onesRow, "carry-ones", onesCarryRow);
+        addWorkingOrder(revealOrder, "tens", tensRow, "carry-tens", tensCarryRow);
+        addWorkingOrder(revealOrder, "answer", answerRow, "carry-answer", answerCarryRow);
+
+        const nextId = nextRevealId(revealOrder);
+        const hasStartedSecondRow = [...state.revealedCells].some(id => id.startsWith("tens-") || id.startsWith("carry-tens-"));
+
+        html += renderRow(tensCarryRow.map((item, index) => ({
+          ...item,
+          revealed: state.revealedCells.has(`carry-tens-${index}`),
+          revealId: hasCellText(item) ? `carry-tens-${index}` : ""
+        })), nextId);
+        html += renderRow(onesCarryRow.map((item, index) => ({
+          ...item,
+          className: `${item.className}${hasStartedSecondRow && hasCellText(item) ? " crossed" : ""}`,
+          revealed: state.revealedCells.has(`carry-ones-${index}`),
+          revealId: hasCellText(item) ? `carry-ones-${index}` : ""
+        })), nextId);
+        html += renderRow(topRow.map(item => ({ ...item, revealed: true })), nextId);
+        html += renderRow(bottomDigits.map(item => ({ ...item, revealed: true })), nextId);
+        html += renderRule("rule-line");
+        html += renderRow(onesRow.map((item, index) => ({
+          ...item,
+          revealed: state.revealedCells.has(`ones-${index}`),
+          revealId: hasCellText(item) ? `ones-${index}` : ""
+        })), nextId);
+        html += renderRow(tensRow.map((item, index) => ({
+          ...item,
+          revealed: state.revealedCells.has(`tens-${index}`),
+          revealId: hasCellText(item) ? `tens-${index}` : ""
+        })), nextId);
+        html += renderRow(answerCarryRow.map((item, index) => ({
+          ...item,
+          revealed: state.revealedCells.has(`carry-answer-${index}`),
+          revealId: hasCellText(item) ? `carry-answer-${index}` : ""
+        })), nextId);
+        html += renderRule("final-line");
+        html += renderRow(answerRow.map((item, index) => ({
+          ...item,
+          revealed: state.revealedCells.has(`answer-${index}`),
+          revealId: hasCellText(item) ? `answer-${index}` : ""
+        })), nextId);
+      }
+
+      elements.workGrid.innerHTML = html;
+    }
+
+    function renderLevels() {
+      elements.levelList.innerHTML = "";
+      LEVELS.forEach(level => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `level-button${level.id === state.level.id ? " active" : ""}`;
+        button.setAttribute("aria-pressed", String(level.id === state.level.id));
+        button.innerHTML = `
+          <span class="level-name">${level.name}: ${level.title}</span>
+          <span class="level-detail">${level.detail}</span>
+        `;
+        button.addEventListener("click", () => {
+          state.level = level;
+          state.questionCount = 1;
+          state.calculated = false;
+          state.revealedCells = new Set();
+          renderLevels();
+          nextQuestion(false);
+        });
+        elements.levelList.appendChild(button);
+      });
+    }
+
+    function renderQuestion() {
+      elements.levelLabel.textContent = `${state.level.name}: ${state.level.title}`;
+      elements.levelRule.textContent = state.level.detail;
+      elements.questionCounter.textContent = `Question ${state.questionCount}`;
+      elements.questionNumber.textContent = `Q${state.questionCount}`;
+      elements.questionText.textContent = `${state.current.top} × ${state.current.bottom}`;
+      elements.layoutHint.textContent = state.level.detail;
+      elements.showWorkout.textContent = state.calculated ? "Cover workout" : "Calculate";
+      renderGrid();
+    }
+
+    function nextQuestion(increment = true) {
+      if (increment) state.questionCount++;
+      state.current = makeQuestion(state.level);
+      state.calculated = false;
+      state.revealedCells = new Set();
+      renderQuestion();
+    }
+
+    elements.showWorkout.addEventListener("click", () => {
+      state.calculated = !state.calculated;
+      state.revealedCells = new Set();
+      renderQuestion();
+    });
+
+    elements.workGrid.addEventListener("click", event => {
+      const revealCell = event.target.closest("[data-reveal-id]");
+      if (!revealCell) return;
+      if (!revealCell.classList.contains("next")) return;
+
+      state.revealedCells.add(revealCell.dataset.revealId);
+      renderQuestion();
+    });
+
+    elements.nextQuestion.addEventListener("click", () => nextQuestion(true));
+
+    renderLevels();
+    state.current = makeQuestion(state.level);
+    renderQuestion();
+
+    window.__multiplicationWorkout = {
+      levels: LEVELS,
+      makeQuestion,
+      singleDigitWork
+    };
+  </script>
+</body>
+</html>

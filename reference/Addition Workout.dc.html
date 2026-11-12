@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><style>
+body{margin:0;min-height:100vh;color:#18212f;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:linear-gradient(130deg,rgba(240,201,88,.22),transparent 32%),linear-gradient(230deg,rgba(49,95,159,.13),transparent 34%),#f7f5ed}
+body::before{content:"";position:fixed;inset:0;z-index:-1;opacity:.62;background-image:linear-gradient(rgba(24,33,47,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(24,33,47,.055) 1px,transparent 1px);background-size:32px 32px;mask-image:linear-gradient(to bottom,#000 0%,transparent 82%)}
+a{color:#315f9f}a:hover{color:#0f5949}
+</style></helmet>
+<div style="width:min(1180px,calc(100% - 32px));margin:0 auto;padding:28px 0 40px">
+  <header style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:end;margin-bottom:20px">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="width:58px;height:58px;border:2px solid #18212f;border-radius:8px;display:grid;place-items:center;background:#f0c958;box-shadow:7px 7px 0 #18212f;font-size:1.75rem;font-weight:950" aria-hidden="true">+</div>
+      <h1 style="margin:0;font-size:clamp(2rem,5vw,4.3rem);line-height:.98">Addition Workout</h1>
+    </div>
+    <div style="justify-self:end;display:flex;gap:10px;align-items:center">
+      <a href="Home.dc.html" style="padding:12px 14px;border:1px solid #d8ddd8;border-radius:8px;background:rgba(255,255,255,.78);font-weight:850;white-space:nowrap;text-decoration:none;color:#315f9f">← Home</a>
+      <div style="padding:12px 14px;border:1px solid #d8ddd8;border-radius:8px;background:rgba(255,255,255,.78);color:#0f5949;font-weight:850;white-space:nowrap">Concrete written method</div>
+    </div>
+  </header>
+  <main style="display:grid;grid-template-columns:300px minmax(0,1fr);gap:22px;align-items:start">
+    <aside style="border:1px solid #d8ddd8;border-radius:8px;background:rgba(255,255,255,.94);box-shadow:0 22px 64px rgba(28,36,48,.14);padding:14px" aria-label="Choose a level">
+      <h2 style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px;color:#647184;font-size:.78rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase">Choose Level <span>{{ qBadge }}</span></h2>
+      <div style="display:grid;gap:8px">
+        <sc-for list="{{ levels }}" as="lv" hint-placeholder-count="3">
+          <button type="button" style="{{ lv.style }}" onClick="{{ lv.onPick }}">
+            <span style="font-size:.96rem;font-weight:950">{{ lv.name }}: {{ lv.title }}</span>
+          </button>
+        </sc-for>
+      </div>
+    </aside>
+    <section style="border:1px solid #d8ddd8;border-radius:8px;background:rgba(255,255,255,.94);box-shadow:0 22px 64px rgba(28,36,48,.14);overflow:hidden" aria-live="polite">
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center;padding:16px 18px;border-bottom:1px solid #d8ddd8;background:linear-gradient(90deg,rgba(23,123,99,.12),transparent),#fbfdfb">
+        <div>
+          <div style="font-weight:950;color:#0f5949">{{ levelLabel }}</div>
+          <div style="color:#647184;font-size:.86rem;line-height:1.35">{{ levelDetail }}</div>
+        </div>
+        <div style="color:#315f9f;font-weight:950">{{ qLabel }}</div>
+      </div>
+      <div style="padding:clamp(18px,4vw,34px);display:grid;grid-template-columns:minmax(300px,1fr) minmax(240px,320px);gap:24px;align-items:start">
+        <div style="border:2px solid #18212f;border-radius:8px;background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(255,253,247,.98));padding:clamp(18px,5vw,34px);overflow-x:auto">
+          <div style="width:max-content;margin:0 auto;display:grid;gap:8px" aria-label="Column addition working">
+            <sc-for list="{{ rows }}" as="row" hint-placeholder-count="6">
+              <sc-if value="{{ row.rule }}" hint-placeholder-val="{{ false }}">
+                <div style="{{ row.style }}"></div>
+              </sc-if>
+              <sc-if value="{{ row.cells }}" hint-placeholder-val="{{ true }}">
+                <div style="{{ row.style }}">
+                  <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="4">
+                    <button type="button" style="{{ c.style }}" onClick="{{ c.onClick }}" disabled="{{ c.disabled }}">{{ c.text }}</button>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </sc-for>
+          </div>
+        </div>
+        <aside style="display:grid;gap:12px" aria-label="Question controls">
+          <div style="border:1px solid #d8ddd8;border-radius:8px;background:#fbfdfb;padding:14px;display:grid;gap:8px">
+            <div style="color:#647184;font-size:.75rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase">Question</div>
+            <div style="font-size:clamp(1.4rem,4vw,2.2rem);font-weight:950;color:#0f5949;font-family:'Trebuchet MS',sans-serif">{{ questionText }}</div>
+          </div>
+          <div style="border:1px solid #d8ddd8;border-radius:8px;background:#fbfdfb;padding:14px;display:grid;gap:8px">
+            <div style="color:#647184;font-size:.75rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase">Layout</div>
+            <div style="color:#647184;font-size:.86rem;line-height:1.35">{{ levelDetail }}</div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px">
+            <button type="button" onClick="{{ onCalc }}" style="border:0;border-radius:8px;min-height:48px;padding:0 18px;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:#177b63;font-weight:950;font-size:1rem;cursor:pointer;font-family:inherit" style-hover="background:#0f5949;transform:translateY(-1px)">{{ calcLabel }}</button>
+            <button type="button" onClick="{{ onNext }}" style="border:0;border-radius:8px;min-height:48px;padding:0 18px;display:inline-flex;align-items:center;justify-content:center;color:#18212f;background:#f0c958;font-weight:950;font-size:1rem;cursor:pointer;font-family:inherit" style-hover="background:#e8ba43;transform:translateY(-1px)">Next question</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;cellSize&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:56,&quot;min&quot;:44,&quot;max&quot;:72,&quot;step&quot;:2,&quot;unit&quot;:&quot;px&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Board&quot;},&quot;freeReveal&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behaviour&quot;}}">
+class Component extends DCLogic {
+  static LEVELS = [
+    { id: 1, name: "Level 01", title: "2 digit + 2 digit", detail: "Add the ones, then the tens. Use the carry space when a column makes ten or more.", aDigits: 2, bDigits: 2 },
+    { id: 2, name: "Level 02", title: "3 digit + 2 digit", detail: "Line up ones under ones and tens under tens, then add each column from the right.", aDigits: 3, bDigits: 2 },
+    { id: 3, name: "Level 03", title: "3 digit + 3 digit", detail: "Three columns to add, working right to left, carrying between columns.", aDigits: 3, bDigits: 3 },
+    { id: 4, name: "Level 04", title: "4 digit + 3 digit", detail: "A 4-digit number on top plus a 3-digit number below. Four columns, working right to left.", aDigits: 4, bDigits: 3 }
+  ];
+  static rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+  static regroups(a, b) {
+    let c = 0;
+    while (a > 0 || b > 0) {
+      const t = (a % 10) + (b % 10) + c;
+      if (t >= 10) return true;
+      c = Math.floor(t / 10);
+      a = Math.floor(a / 10); b = Math.floor(b / 10);
+    }
+    return false;
+  }
+  static make(level) {
+    const n = d => Component.rand(10 ** (d - 1), 10 ** d - 1);
+    const wantRegroup = Math.random() < 0.9;
+    let a = n(level.aDigits), b = n(level.bDigits);
+    for (let i = 0; i < 60 && Component.regroups(a, b) !== wantRegroup; i++) {
+      a = n(level.aDigits); b = n(level.bDigits);
+    }
+    return { a, b, answer: a + b };
+  }
+  state = { levelId: 1, qNum: 1, calculated: false, revealed: {}, current: Component.make(Component.LEVELS[0]) };
+  level() { return Component.LEVELS.find(l => l.id === this.state.levelId); }
+  pick(id) {
+    const lv = Component.LEVELS.find(l => l.id === id);
+    this.setState({ levelId: id, qNum: 1, current: Component.make(lv), calculated: false, revealed: {} });
+  }
+  renderVals() {
+    const CS = this.props.cellSize ?? 56;
+    const free = this.props.freeReveal ?? false;
+    const { current, calculated, revealed, qNum, levelId } = this.state;
+    const lvl = this.level();
+    const dig = n => String(n).split("").map(Number);
+    const aD = dig(current.a), bD = dig(current.b), ansD = dig(current.answer);
+    const cols = Math.max(aD.length, bD.length, ansD.length) + 1;
+    const pad = arr => Array(cols - arr.length).fill(null).concat(arr);
+    const A = pad(aD), B = pad(bD), ANS = pad(ansD);
+    const carries = Array(cols).fill(null);
+    let cy = 0;
+    for (let i = cols - 1; i >= 0; i--) {
+      const t = (A[i] ?? 0) + (B[i] ?? 0) + cy;
+      cy = i === 0 ? 0 : Math.floor(t / 10);
+      if (cy) carries[i - 1] = cy;
+    }
+    const order = [];
+    for (let i = cols - 1; i >= 0; i--) {
+      if (ANS[i] !== null) order.push("a-" + i);
+      if (i - 1 >= 0 && carries[i - 1] !== null) order.push("c-" + (i - 1));
+    }
+    const nextId = order.find(id => !revealed[id]) || "";
+    const reveal = id => () => this.setState(s => ({ revealed: { ...s.revealed, [id]: true } }));
+    const base = { width: CS, height: CS, border: "2px solid #18212f", borderRadius: 8, background: "#fff", display: "grid", placeItems: "center", fontSize: CS * 0.54, fontWeight: 900, fontFamily: "'Trebuchet MS',sans-serif", color: "#18212f", padding: 0, lineHeight: 1 };
+    const blank = { width: CS, height: CS, border: "none", background: "transparent", padding: 0 };
+    const cbase = { width: CS / 2, height: 24, border: "1.5px dashed #9cacb7", borderRadius: 6, background: "#f9fbfd", display: "grid", placeItems: "center", color: "#d96d5c", fontSize: 15, fontWeight: 900, fontFamily: "'Trebuchet MS',sans-serif", padding: 0, justifySelf: "start", lineHeight: 1 };
+    const mkAns = i => {
+      const id = "a-" + i, isRev = !!revealed[id];
+      if (!calculated) return { text: "?", style: { ...base, color: "#9da8b4", fontSize: CS * 0.43 }, disabled: true };
+      if (isRev) return { text: String(ANS[i]), style: { ...base, background: "#e9f5ef", borderColor: "#0f5949", color: "#0f5949" }, disabled: true };
+      const isNext = free || id === nextId;
+      return { text: "?", style: { ...base, background: "#f5f8fb", borderColor: isNext ? "#315f9f" : "#8fa0ad", color: "#788797", fontSize: CS * 0.43, boxShadow: isNext ? "0 0 0 3px rgba(49,95,159,.18)" : "none", cursor: isNext ? "pointer" : "not-allowed", opacity: isNext ? 1 : 0.62 }, onClick: isNext ? reveal(id) : undefined, disabled: !isNext };
+    };
+    const mkCarry = i => {
+      const id = "c-" + i, isRev = !!revealed[id];
+      if (!calculated) return { text: "", style: cbase, disabled: true };
+      if (isRev) return { text: String(carries[i]), style: { ...cbase, borderStyle: "solid", borderColor: "#d96d5c", background: "#fff1ed" }, disabled: true };
+      const isNext = free || id === nextId;
+      return { text: "?", style: { ...cbase, color: "#788797", background: "#f5f8fb", borderColor: isNext ? "#315f9f" : "#9cacb7", boxShadow: isNext ? "0 0 0 3px rgba(49,95,159,.18)" : "none", cursor: isNext ? "pointer" : "not-allowed", opacity: isNext ? 1 : 0.62 }, onClick: isNext ? reveal(id) : undefined, disabled: !isNext };
+    };
+    const rowStyle = { display: "grid", gridTemplateColumns: `repeat(${cols},${CS}px)`, gap: 8, justifyContent: "end" };
+    const cblank = { width: CS / 2, height: 24, border: "none", background: "transparent", padding: 0, justifySelf: "start" };
+    const opCol = 0;
+    const rows = [
+      { key: "carry", style: rowStyle, cells: A.map((_, i) => carries[i] !== null ? mkCarry(i) : { text: "", style: cblank, disabled: true }) },
+      { key: "a", style: rowStyle, cells: A.map(d => d === null ? { text: "", style: blank, disabled: true } : { text: String(d), style: base, disabled: true }) },
+      { key: "b", style: rowStyle, cells: B.map((d, i) => i === opCol ? { text: "+", style: { ...blank, display: "grid", placeItems: "center", color: "#0f5949", fontSize: CS * 0.5, fontWeight: 900, fontFamily: "'Trebuchet MS',sans-serif" }, disabled: true } : (d === null ? { text: "", style: blank, disabled: true } : { text: String(d), style: base, disabled: true })) },
+      { rule: true, style: { height: 4, borderRadius: 999, background: "#18212f", margin: "5px 0 2px", width: "100%" } },
+      { key: "ans", style: rowStyle, cells: ANS.map((d, i) => d === null ? { text: "", style: blank, disabled: true } : mkAns(i)) },
+      { rule: true, style: { height: 4, borderRadius: 999, background: "#0f5949", margin: "5px 0 2px", width: "100%" } }
+    ];
+    const levels = Component.LEVELS.map(lv => ({
+      ...lv,
+      onPick: () => this.pick(lv.id),
+      style: { width: "100%", textAlign: "left", cursor: "pointer", display: "grid", gap: 6, padding: 12, borderRadius: 8, font: "inherit", color: "#18212f", border: lv.id === levelId ? "1px solid #177b63" : "1px solid #d8ddd8", background: lv.id === levelId ? "#e8f4ef" : "#fff", boxShadow: lv.id === levelId ? "inset 4px 0 0 #177b63" : "none" }
+    }));
+    return {
+      rows, levels,
+      qBadge: "Q" + qNum,
+      qLabel: "Question " + qNum,
+      levelLabel: `${lvl.name}: ${lvl.title}`,
+      levelDetail: lvl.detail,
+      questionText: `${current.a} + ${current.b}`,
+      calcLabel: calculated ? "Cover workout" : "Calculate",
+      onCalc: () => this.setState(s => ({ calculated: !s.calculated, revealed: {} })),
+      onNext: () => this.setState(s => ({ qNum: s.qNum + 1, current: Component.make(lvl), calculated: false, revealed: {} }))
+    };
+  }
+}
+</script>
+</body>
+</html>
