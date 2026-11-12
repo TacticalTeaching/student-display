@@ -1,0 +1,87 @@
+/* Shared style for all displays — black, white and grey only.
+   Large text and buttons so it reads well on a projector and works on touch screens. */
+:root {
+  --bg: #ffffff;
+  --fg: #111111;
+  --mid: #777777;
+  --light: #e6e6e6;
+  --border: #222222;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 3px solid var(--border);
+}
+header h1 { margin: 0; font-size: 1.6rem; }
+header a { color: var(--fg); font-weight: 600; text-decoration: none; font-size: 1.1rem; }
+header a:hover { text-decoration: underline; }
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  gap: 20px;
+}
+button {
+  font: inherit;
+  font-size: 1.6rem;
+  font-weight: 600;
+  padding: 16px 20px;
+  border: 3px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--fg);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+button:hover { background: var(--light); }
+button:active { background: var(--fg); color: var(--bg); }
+button.dark { background: var(--fg); color: var(--bg); }
+button.dark:hover { background: #333; }
+input[type="number"] {
+  font: inherit;
+  font-size: 1.6rem;
+  width: 5.5em;
+  padding: 10px;
+  border: 3px solid var(--border);
+  border-radius: 10px;
+  text-align: center;
+}
+
+/* Home page grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+  width: 100%;
+  max-width: 1000px;
+}
+.card {
+  display: block;
+  padding: 28px 20px;
+  border: 3px solid var(--border);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--fg);
+  text-align: center;
+}
+.card:hover { background: var(--light); }
+.card h2 { margin: 0 0 8px; font-size: 1.5rem; }
+.card p { margin: 0; color: var(--mid); }
+
+/* Fullscreen helper button */
+.fs-btn { font-size: 1rem; padding: 8px 14px; }
