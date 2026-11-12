@@ -448,16 +448,18 @@
       opacity: 1;
     }
 
+    /* Carry box sits small, above the top-left corner of the digit it belongs to */
     .carry-slot {
       width: var(--cell);
-      height: calc(var(--cell) * 0.6);
+      height: calc(var(--cell) * 0.42);
       display: grid;
-      place-items: center;
+      align-items: end;
+      justify-items: start;
     }
 
     .carry {
-      width: calc(var(--cell) * 0.55);
-      height: calc(var(--cell) * 0.55);
+      width: calc(var(--cell) * 0.38);
+      height: calc(var(--cell) * 0.38);
       border: 1.5px dashed #9cacb7;
       border-radius: 6px;
       background: #f9fbfd;
@@ -465,7 +467,7 @@
       place-items: center;
       padding: 0;
       font-family: "Trebuchet MS", Inter, sans-serif;
-      font-size: calc(var(--cell) * 0.34);
+      font-size: calc(var(--cell) * 0.26);
       font-weight: 900;
       color: #9da8b4;
       opacity: 0.62;
@@ -1053,7 +1055,7 @@
     function fitBoard() {
       const layout = layoutColumns();
       const widthUnits = layout.reduce((sum, item) => sum + (item.type === "point" ? 0.4 : 1), 0) + (layout.length - 1) * 0.14;
-      const heightUnits = 0.6 + 3 + 0.07 * 2 + 5 * 0.14;
+      const heightUnits = 0.42 + 3 + 0.07 * 2 + 5 * 0.14;
       const availableWidth = boardArea.clientWidth * 0.94;
       const availableHeight = boardArea.clientHeight * 0.94;
       const cell = Math.max(26, Math.min(availableWidth / widthUnits, availableHeight / heightUnits, 110));
