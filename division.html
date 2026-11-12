@@ -599,9 +599,17 @@
       font-size: calc(var(--cell) * 0.45);
     }
 
+    /* The r sits close to the ones digit, with a little more space before the remainder */
     .cell.rlabel {
+      width: auto;
+      justify-self: start;
+      margin-left: calc(var(--cell) * -0.03);
       color: var(--coral);
       font-size: calc(var(--cell) * 0.4);
+    }
+
+    .cell.answer.is-rvalue-box {
+      transform: translateX(calc(var(--cell) * 0.05));
     }
 
     /* Quotient green (default), products blue, remainder rows plain, remainder value coral */
@@ -1163,7 +1171,7 @@
       const sizes = [];
       for (let c = 1; c <= q.columns; c++) {
         if (c === q.gutterCol) sizes.push("calc(var(--cell) * 0.22)");
-        else if (c === q.remLabelCol) sizes.push("calc(var(--cell) * 0.5)");
+        else if (c === q.remLabelCol) sizes.push("calc(var(--cell) * 0.4)");
         else sizes.push("var(--cell)");
       }
       board.style.gridTemplateColumns = sizes.join(" ");
@@ -1238,10 +1246,12 @@
         cell.className = "cell answer";
         if (isDone) {
           cell.classList.add("is-revealed", `is-${item.kind}`);
+          if (item.kind === "rvalue") cell.classList.add("is-rvalue-box");
           cell.textContent = item.text;
           if (pointCells.has(`${item.row}-${item.col}`)) cell.classList.add("has-point");
         } else {
           cell.textContent = "?";
+          if (item.kind === "rvalue") cell.classList.add("is-rvalue-box");
           if (isNext) {
             cell.classList.add("is-next");
             cell.addEventListener("click", revealNext);
@@ -1255,7 +1265,7 @@
     function fitBoard() {
       const rows = question.rowHeights;
       const heightUnits = rows.reduce((sum, h) => sum + (h === "rule" ? 0.07 : 1), 0) + (rows.length - 1) * 0.14;
-      const widthUnits = question.columns - 0.78 - (question.remLabelCol ? 0.5 : 0) + (question.columns - 1) * 0.14;
+      const widthUnits = question.columns - 0.78 - (question.remLabelCol ? 0.55 : 0) + (question.columns - 1) * 0.14;
       const availableWidth = boardArea.clientWidth * 0.94;
       const availableHeight = boardArea.clientHeight * 0.94;
       const cell = Math.max(20, Math.min(availableWidth / widthUnits, availableHeight / heightUnits, 110));
