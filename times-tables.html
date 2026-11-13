@@ -1,0 +1,1684 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Times Tables</title>
+  <style>
+    :root {
+      --ink: #18212f;
+      --muted: #647184;
+      --paper: #f8f8f6;
+      --panel: #ffffff;
+      --line: #d8ddd8;
+      --slate: #c6ccd2;
+      --soft: #eef4f1;
+      --green: #177b63;
+      --green-dark: #0f5949;
+      --green-light: #e8f4ef;
+      --blue: #315f9f;
+      --yellow: #f0c958;
+      --yellow-hover: #e8ba43;
+      --coral: #d96d5c;
+      --coral-light: #fff1ed;
+      --red: #c0392b;
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--paper);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      opacity: 0.5;
+      background-image:
+        linear-gradient(rgba(74, 124, 190, 0.28) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74, 124, 190, 0.28) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    a {
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    /* Full-viewport zero-scroll layout for Chromebook (1366x768) & Classroom TV (1920x1080+) */
+    .app {
+      width: min(1680px, 100%);
+      height: 100dvh;
+      max-height: 100dvh;
+      margin: 0 auto;
+      padding: clamp(8px, 1.5vh, 20px) clamp(12px, 1.8vw, 28px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: clamp(8px, 1.4vh, 16px);
+      overflow: hidden;
+    }
+
+    .top-bar,
+    .workspace {
+      display: grid;
+      grid-template-columns: clamp(175px, 15vw, 230px) minmax(0, 1fr) clamp(220px, 21vw, 300px);
+      gap: clamp(10px, 1.2vw, 16px);
+      align-items: stretch;
+    }
+
+    .workspace {
+      min-height: 0;
+    }
+
+    .nav-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-btn {
+      flex: 1;
+      min-height: clamp(38px, 5.5vh, 52px);
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--yellow);
+      color: var(--ink);
+      font-weight: 950;
+      font-size: clamp(0.88rem, 1.1vw, 1.08rem);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: transform 120ms ease, background 120ms ease;
+    }
+
+    .nav-btn:hover,
+    .nav-btn:focus-visible {
+      background: var(--yellow-hover);
+      transform: translateY(-1px);
+      outline: 3px solid rgba(24, 33, 47, 0.18);
+    }
+
+    .title-banner {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--slate);
+      padding: clamp(6px, 1vh, 12px) 16px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+    }
+
+    .title-banner h1 {
+      margin: 0;
+      font-size: clamp(1.2rem, 2.2vw, 1.85rem);
+      font-weight: 950;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+    }
+
+    .year-badge-card {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: 4px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .year-badge-label {
+      background: var(--green-light);
+      border: 1.5px solid var(--green);
+      color: var(--green-dark);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: clamp(0.68rem, 0.9vw, 0.85rem);
+      font-weight: 950;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .year-badge-value {
+      font-size: clamp(0.72rem, 0.95vw, 1rem);
+      font-weight: 950;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Left column: mode + year selector + controls */
+    .left-col {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: clamp(8px, 1.2vh, 12px);
+      min-height: 0;
+    }
+
+    .panel-card {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: clamp(8px, 1.2vh, 14px);
+      min-height: 0;
+    }
+
+    .panel-heading {
+      margin: 0 0 clamp(6px, 1vh, 10px);
+      color: var(--muted);
+      font-size: clamp(0.66rem, 0.85vw, 0.78rem);
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .mode-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .mode-button {
+      border: 0;
+      min-height: clamp(30px, 4.4vh, 42px);
+      background: #fff;
+      color: var(--muted);
+      font-size: clamp(0.74rem, 0.92vw, 0.9rem);
+      font-weight: 950;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+
+    .mode-button + .mode-button {
+      border-left: 1.5px solid var(--line);
+    }
+
+    .mode-button.is-active {
+      background: var(--green);
+      color: #fff;
+    }
+
+    .mode-button:not(.is-active):hover,
+    .mode-button:not(.is-active):focus-visible {
+      background: var(--green-light);
+      color: var(--green-dark);
+      outline: none;
+    }
+
+    .year-panel {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .level-grid {
+      display: grid;
+      grid-template-rows: repeat(6, minmax(0, 1fr));
+      gap: clamp(4px, 0.7vh, 8px);
+      min-height: 0;
+    }
+
+    .level-button {
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--muted);
+      font-weight: 850;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 0 clamp(8px, 1vw, 12px);
+      min-height: 0;
+      transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    }
+
+    .level-button strong {
+      font-size: clamp(0.88rem, 1.15vw, 1.12rem);
+      font-weight: 950;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .level-button span {
+      font-size: clamp(0.66rem, 0.8vw, 0.8rem);
+      font-weight: 800;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .level-button.is-active {
+      background: var(--green-light);
+      border: 2px solid var(--green);
+      box-shadow: inset 4px 0 0 var(--green);
+    }
+
+    .level-button.is-active strong,
+    .level-button.is-active span {
+      color: var(--green-dark);
+    }
+
+    .level-button:hover,
+    .level-button:focus-visible {
+      border-color: var(--green);
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .actions {
+      display: grid;
+      gap: clamp(6px, 0.9vh, 10px);
+    }
+
+    .action-button {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      min-height: clamp(34px, 5vh, 48px);
+      padding: 0 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      background: var(--green);
+      font-weight: 950;
+      font-size: clamp(0.84rem, 1.05vw, 1rem);
+      cursor: pointer;
+      transition: transform 120ms ease, background 120ms ease;
+    }
+
+    .action-button:hover,
+    .action-button:focus-visible {
+      transform: translateY(-1px);
+      background: var(--green-dark);
+      outline: 3px solid rgba(23, 123, 99, 0.22);
+    }
+
+    .action-button.secondary {
+      color: var(--ink);
+      background: var(--yellow);
+    }
+
+    .action-button.secondary:hover,
+    .action-button.secondary:focus-visible {
+      background: var(--yellow-hover);
+      outline-color: rgba(240, 201, 88, 0.35);
+    }
+
+    .action-button.ghost {
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .action-button.ghost:hover,
+    .action-button.ghost:focus-visible {
+      background: var(--soft);
+    }
+
+    /* Centre column: question + workout */
+    .center-col {
+      display: grid;
+      grid-template-rows: minmax(70px, 0.2fr) minmax(0, 0.8fr);
+      gap: clamp(8px, 1.4vh, 16px);
+      min-height: 0;
+    }
+
+    .question-box {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(255, 253, 247, 0.98));
+      display: grid;
+      place-items: center;
+      padding: clamp(8px, 1.4vh, 16px) clamp(14px, 2vw, 28px);
+      position: relative;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .box-tag {
+      position: absolute;
+      top: clamp(6px, 1vh, 10px);
+      left: clamp(10px, 1.2vw, 14px);
+      font-size: clamp(0.64rem, 0.8vw, 0.76rem);
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .question-display {
+      font-family: "Trebuchet MS", Inter, sans-serif;
+      font-size: clamp(2rem, min(5.4vw, 8vh), 4.6rem);
+      font-weight: 900;
+      line-height: 1;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .question-display .blank {
+      display: inline-block;
+      width: 1.6em;
+      height: 0.95em;
+      margin-left: 0.15em;
+      vertical-align: -0.08em;
+      border: 3px dashed #9cacb7;
+      border-radius: var(--radius);
+    }
+
+    .timer-display {
+      color: var(--ink);
+    }
+
+    .timer-display.is-running {
+      color: var(--green-dark);
+    }
+
+    .workout-box {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: clamp(8px, 1.4vh, 16px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: clamp(6px, 1.1vh, 12px);
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .workout-title {
+      margin: 0;
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius);
+      padding: clamp(6px, 0.9vh, 10px) 14px;
+      background: linear-gradient(90deg, rgba(23, 123, 99, 0.12), transparent), #fbfdfb;
+      color: var(--green-dark);
+      font-size: clamp(0.76rem, 0.95vw, 0.92rem);
+      font-weight: 950;
+      letter-spacing: 0.05em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .board-area {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .board-area.is-covered .board {
+      visibility: hidden;
+    }
+
+    /* Cover hides the workings until students have answered on their whiteboards */
+    .layout-cover {
+      position: absolute;
+      inset: 0;
+      border: 2px dashed #8fa0ad;
+      border-radius: var(--radius);
+      background:
+        repeating-linear-gradient(
+          90deg,
+          #f5f8fb 0,
+          #f5f8fb 16px,
+          #eef3f8 16px,
+          #eef3f8 32px
+        );
+      display: grid;
+      place-content: center;
+      gap: clamp(6px, 1.2vh, 14px);
+      padding: 16px;
+      text-align: center;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 120ms ease, box-shadow 120ms ease;
+    }
+
+    .layout-cover:hover,
+    .layout-cover:focus-visible {
+      border-color: var(--blue);
+      box-shadow: inset 0 0 0 3px rgba(49, 95, 159, 0.18);
+      outline: none;
+    }
+
+    .layout-cover strong {
+      color: var(--ink);
+      font-size: clamp(1.1rem, 2vw, 1.8rem);
+      font-weight: 950;
+    }
+
+    .layout-cover span {
+      font-size: clamp(0.85rem, 1.2vw, 1.1rem);
+      font-weight: 850;
+    }
+
+    /* One Fact board: strategy lines revealed one at a time */
+    .board {
+      --fs: 40px;
+      display: grid;
+      grid-template-columns: max-content;
+      gap: calc(var(--fs) * 0.32);
+      justify-content: center;
+      align-content: center;
+      font-family: "Trebuchet MS", Inter, sans-serif;
+    }
+
+    .line {
+      display: grid;
+      grid-template-columns: calc(var(--fs) * 1.1) 1fr;
+      align-items: center;
+      gap: calc(var(--fs) * 0.35);
+    }
+
+    .line-tag {
+      width: calc(var(--fs) * 1.1);
+      height: calc(var(--fs) * 1.1);
+      border-radius: 50%;
+      border: 2px solid #9cacb7;
+      display: grid;
+      place-items: center;
+      font-size: calc(var(--fs) * 0.5);
+      font-weight: 950;
+      color: #9cacb7;
+      background: #fff;
+    }
+
+    .line-box {
+      border: 2px solid #8fa0ad;
+      border-radius: var(--radius);
+      background: #f5f8fb;
+      min-height: calc(var(--fs) * 1.55);
+      padding: calc(var(--fs) * 0.18) calc(var(--fs) * 0.55);
+      display: grid;
+      place-items: center;
+      font-size: var(--fs);
+      font-weight: 900;
+      line-height: 1.1;
+      white-space: nowrap;
+      opacity: 0.62;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .line-box .txt {
+      visibility: hidden;
+    }
+
+    .line.is-next .line-box {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(49, 95, 159, 0.22);
+      cursor: pointer;
+      opacity: 1;
+    }
+
+    .line.is-next .line-tag {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    .line.is-revealed .line-box {
+      border-color: var(--green-dark);
+      background: var(--green-light);
+      color: var(--green-dark);
+      opacity: 1;
+    }
+
+    .line.is-revealed .line-box .txt {
+      visibility: visible;
+    }
+
+    .line.is-revealed .line-tag {
+      border-color: var(--green-dark);
+      background: var(--green-light);
+      color: var(--green-dark);
+    }
+
+    .line.is-answer .line-box {
+      font-size: calc(var(--fs) * 1.15);
+    }
+
+    .line.is-answer.is-revealed .line-box {
+      background: #fff;
+      border-width: 3px;
+      color: var(--ink);
+    }
+
+    .rule {
+      height: calc(var(--fs) * 0.09);
+      min-height: 3px;
+      border-radius: 999px;
+      background: var(--red);
+      margin-left: calc(var(--fs) * 1.45);
+    }
+
+    .family-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: calc(var(--fs) * 0.2) calc(var(--fs) * 0.6);
+      font-size: calc(var(--fs) * 0.72);
+    }
+
+    .family-grid .txt {
+      text-align: center;
+    }
+
+    /* Quick-fire grid */
+    .qf-grid {
+      --qfs: 28px;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-auto-flow: column;
+      gap: calc(var(--qfs) * 0.28) calc(var(--qfs) * 0.7);
+      align-content: center;
+      justify-content: center;
+      font-family: "Trebuchet MS", Inter, sans-serif;
+    }
+
+    .qf-item {
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      display: grid;
+      grid-template-columns: calc(var(--qfs) * 1.3) max-content calc(var(--qfs) * 2.6);
+      align-items: center;
+      gap: calc(var(--qfs) * 0.3);
+      padding: calc(var(--qfs) * 0.12) calc(var(--qfs) * 0.4) calc(var(--qfs) * 0.12) calc(var(--qfs) * 0.2);
+      font-family: inherit;
+      font-size: var(--qfs);
+      font-weight: 900;
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .qf-item:hover,
+    .qf-item:focus-visible {
+      border-color: var(--blue);
+      outline: none;
+    }
+
+    .qf-num {
+      color: var(--muted);
+      font-size: 0.6em;
+      font-weight: 950;
+      text-align: right;
+    }
+
+    .qf-q {
+      white-space: nowrap;
+    }
+
+    .qf-a {
+      height: 1.25em;
+      border: 2px dashed #9cacb7;
+      border-radius: 6px;
+      display: grid;
+      place-items: center;
+      white-space: nowrap;
+    }
+
+    .qf-a .txt {
+      visibility: hidden;
+    }
+
+    .qf-item.is-revealed .qf-a {
+      border: 2px solid var(--green-dark);
+      background: var(--green-light);
+      color: var(--green-dark);
+    }
+
+    .qf-item.is-revealed .qf-a .txt {
+      visibility: visible;
+    }
+
+    .step-text {
+      margin: 0;
+      min-height: clamp(38px, 6vh, 56px);
+      border: 2px solid var(--green-dark);
+      border-radius: var(--radius);
+      padding: 6px clamp(10px, 1.2vw, 16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: var(--green-light);
+      color: var(--green-dark);
+      font-size: clamp(0.95rem, 1.45vw, 1.35rem);
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    .step-text.is-prompt {
+      border-color: #8fa0ad;
+      background: #f5f8fb;
+      color: var(--muted);
+    }
+
+    /* Right column: helpful hints */
+    .box-e {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: clamp(8px, 1.2vh, 14px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .box-e .panel-heading {
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius);
+      padding: clamp(6px, 0.9vh, 10px) 10px;
+      background: linear-gradient(90deg, rgba(23, 123, 99, 0.12), transparent), #fbfdfb;
+      color: var(--green-dark);
+      text-align: center;
+      margin-bottom: clamp(6px, 1vh, 10px);
+    }
+
+    .hint-list {
+      margin: 0;
+      padding: 0 2px 0 0;
+      list-style: none;
+      display: grid;
+      align-content: start;
+      grid-auto-rows: max-content;
+      gap: clamp(4px, 0.7vh, 7px);
+      overflow-y: auto;
+      min-height: 0;
+    }
+
+    .hint-list li {
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #fff;
+      font-size: clamp(0.76rem, 0.9vw, 0.86rem);
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .hint-toggle {
+      width: 100%;
+      min-height: clamp(26px, 3.8vh, 34px);
+      border: 0;
+      padding: 5px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f5f8fb;
+      color: var(--ink);
+      font-size: clamp(0.64rem, 0.78vw, 0.74rem);
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .hint-toggle::after {
+      content: "+";
+      color: var(--blue);
+      font-size: 0.95rem;
+      font-weight: 950;
+    }
+
+    .hint-toggle.is-revealed {
+      background: var(--green-light);
+      color: var(--green-dark);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hint-toggle.is-revealed::after {
+      content: "−";
+      color: var(--green-dark);
+    }
+
+    .hint-toggle:hover,
+    .hint-toggle:focus-visible {
+      background: #e8eff7;
+      outline: none;
+    }
+
+    .hint-body {
+      padding: 6px 10px 8px;
+    }
+
+    .hint-example {
+      display: block;
+      margin-top: 2px;
+      color: var(--green-dark);
+      font-family: "Trebuchet MS", Inter, sans-serif;
+      font-weight: 950;
+    }
+
+    @media (max-width: 900px) {
+      .app {
+        height: auto;
+        max-height: none;
+        overflow: visible;
+      }
+
+      .top-bar,
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .level-grid {
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: auto;
+      }
+
+      .level-button {
+        min-height: 44px;
+      }
+
+      .actions {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .center-col {
+        grid-template-rows: auto minmax(360px, auto);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-bar">
+      <nav class="nav-group" aria-label="Page navigation">
+        <a class="nav-btn" href="home.html" data-page="home" title="Home">Home</a>
+        <a class="nav-btn" href="basic-facts.html" data-page="basic-facts" title="Back">Back</a>
+      </nav>
+      <div class="title-banner">
+        <h1 id="pageTitle">Times Tables</h1>
+      </div>
+      <div class="year-badge-card" aria-live="polite">
+        <span class="year-badge-label" id="yearBadgeLabel">Year 3</span>
+        <span class="year-badge-value" id="yearBadgeText"></span>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <aside class="left-col" aria-label="Choose mode, year and controls">
+        <div class="panel-card">
+          <p class="panel-heading">Mode</p>
+          <div class="mode-switch" role="group" aria-label="Mode">
+            <button class="mode-button is-active" type="button" data-mode="one">One Fact</button>
+            <button class="mode-button" type="button" data-mode="quick">Quick-fire</button>
+          </div>
+        </div>
+
+        <div class="panel-card year-panel">
+          <p class="panel-heading">Year</p>
+          <div class="level-grid" id="levelGrid"></div>
+        </div>
+
+        <div class="panel-card">
+          <p class="panel-heading">Controls</p>
+          <div class="actions">
+            <button class="action-button" id="btnNew" type="button">New Question</button>
+            <button class="action-button secondary" id="btnNext" type="button">Reveal Next</button>
+            <button class="action-button ghost" id="btnAll" type="button">Reveal All</button>
+            <button class="action-button ghost" id="btnHide" type="button">Cover Workout</button>
+          </div>
+        </div>
+      </aside>
+
+      <div class="center-col">
+        <section class="question-box" aria-label="Current question">
+          <span class="box-tag" id="questionTag">Question</span>
+          <div class="question-display" id="questionDisplay"></div>
+        </section>
+
+        <main class="workout-box" aria-label="Workout">
+          <p class="workout-title" id="workoutTitle"></p>
+          <div class="board-area is-covered" id="boardArea">
+            <div class="board" id="board"></div>
+            <div class="qf-grid" id="qfGrid" hidden></div>
+            <button class="layout-cover" id="layoutCover" type="button">
+              <strong>Answer on your whiteboard</strong>
+              <span>Click here to check the strategy</span>
+            </button>
+          </div>
+          <p class="step-text is-prompt" id="stepText" aria-live="polite"></p>
+        </main>
+      </div>
+
+      <aside class="box-e" aria-label="Helpful hints and examples">
+        <p class="panel-heading">Helpful hints</p>
+        <ul class="hint-list" id="hintList"></ul>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // "multiply" for Times Tables, "divide" for Division Facts. Everything else is shared.
+    const OPERATION = "multiply";
+    const DIV = OPERATION === "divide";
+    const SIGN = DIV ? "÷" : "×";
+
+    const levelGrid = document.getElementById("levelGrid");
+    const questionDisplay = document.getElementById("questionDisplay");
+    const questionTag = document.getElementById("questionTag");
+    const boardArea = document.getElementById("boardArea");
+    const board = document.getElementById("board");
+    const qfGrid = document.getElementById("qfGrid");
+    const stepText = document.getElementById("stepText");
+    const layoutCover = document.getElementById("layoutCover");
+    const workoutTitle = document.getElementById("workoutTitle");
+    const yearBadgeLabel = document.getElementById("yearBadgeLabel");
+    const yearBadgeText = document.getElementById("yearBadgeText");
+    const btnNew = document.getElementById("btnNew");
+    const btnNext = document.getElementById("btnNext");
+    const btnAll = document.getElementById("btnAll");
+    const btnHide = document.getElementById("btnHide");
+
+    // focus: the tables this year is learning. review: earlier tables mixed in (about 1 in 4).
+    // max: biggest other factor. extended: Year 8 bigger numbers and decimals.
+    const yearSettings = {
+      3: { focus: [2, 5, 10], review: [], max: 10 },
+      4: { focus: [3, 4, 8], review: [2, 5, 10], max: 10 },
+      5: { focus: [6, 7, 9], review: [2, 3, 4, 5, 8, 10], max: 10 },
+      6: { focus: [6, 7, 8, 9], review: [2, 3, 4, 5, 10], max: 10 },
+      7: { focus: [11, 12], review: [3, 4, 6, 7, 8, 9], max: 12 },
+      8: { focus: [3, 4, 6, 7, 8, 9], review: [], max: 9, extended: true }
+    };
+
+    const yearLabels = DIV
+      ? {
+        3: ["÷2 ÷5 ÷10", "÷ 2, ÷ 5 and ÷ 10 facts"],
+        4: ["÷3 ÷4 ÷8", "÷ 3, ÷ 4 and ÷ 8 facts"],
+        5: ["÷6 ÷7 ÷9", "÷ 6, ÷ 7 and ÷ 9 facts"],
+        6: ["to 100 ÷ 10", "All division facts to 100 ÷ 10"],
+        7: ["to 144 ÷ 12", "Division facts to 144 ÷ 12"],
+        8: ["bigger numbers", "Place value facts"]
+      }
+      : {
+        3: ["×2 ×5 ×10", "×2, ×5 and ×10 tables"],
+        4: ["×3 ×4 ×8", "×3, ×4 and ×8 tables"],
+        5: ["×6 ×7 ×9", "×6, ×7 and ×9 tables"],
+        6: ["to 10 × 10", "All facts to 10 × 10"],
+        7: ["to 12 × 12", "Facts to 12 × 12"],
+        8: ["bigger numbers", "Place value facts"]
+      };
+
+    const hints = DIV
+      ? [
+        ["Think multiplication", "Every division fact is a times table fact backwards.", "56 ÷ 8 → 8 × ? = 56"],
+        ["÷ 2 is halve", "Split the number into two equal parts.", "18 ÷ 2 → half of 18 = 9"],
+        ["÷ 4 and ÷ 8", "÷ 4: halve, then halve again. ÷ 8: halve three times.", "48 ÷ 8 → 24 → 12 → 6"],
+        ["÷ 10", "Each digit moves one place to the right.", "70 ÷ 10 = 7"],
+        ["÷ 5", "Double the number, then ÷ 10.", "35 ÷ 5 → 70 ÷ 10 = 7"],
+        ["Chunk it", "Take away a fact you know (5 or 10 groups), then deal with what is left.", "63 ÷ 9 → 45 is 5 nines, 18 is 2 more → 7"],
+        ["Fact families", "One fact gives you four.", "7 × 8 = 56, 8 × 7 = 56, 56 ÷ 8 = 7, 56 ÷ 7 = 8"],
+        ["Bigger numbers", "Use the basic fact, then think about place value.", "5600 ÷ 8 → 56 ÷ 8 = 7 → 700"]
+      ]
+      : [
+        ["Turnarounds", "You can multiply in any order. Learn one fact, get two.", "3 × 8 = 8 × 3 = 24"],
+        ["× 2 is double", "Add the number to itself.", "7 × 2 → 7 + 7 = 14"],
+        ["× 4 and × 8", "× 4: double, double. × 8: double, double, double.", "6 × 8 → 12 → 24 → 48"],
+        ["× 10 and × 5", "× 10: digits move one place left. × 5 is half of × 10.", "7 × 5 → half of 70 = 35"],
+        ["× 3 and × 6", "× 3 is double plus one more group. × 6 is × 5 plus one more group.", "8 × 6 → 40 + 8 = 48"],
+        ["× 9", "× 10, then take away one group.", "7 × 9 → 70 − 7 = 63"],
+        ["× 7", "× 5 plus × 2.", "8 × 7 → 40 + 16 = 56"],
+        ["× 11 and × 12", "× 10 plus one group (× 11) or two groups (× 12).", "7 × 12 → 70 + 14 = 84"],
+        ["Bigger numbers", "Use the basic fact, then think about place value.", "7 × 80 → 7 × 8 = 56 → 560"]
+      ];
+
+    let mode = "one";
+    let currentYear = 3;
+    let question = null;
+    let revealed = 0;
+    let covered = true;
+    let lastText = "";
+
+    let qfCount = 20;
+    let qfSet = [];
+    let qfShown = new Set();
+    let timerStart = 0;
+    let timerElapsed = 0;
+    let timerId = null;
+
+    function randomInteger(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function pick(list) {
+      return list[Math.floor(Math.random() * list.length)];
+    }
+
+    // Write an integer scaled by 10^-dp as a decimal, without floating point errors
+    function fmt(intValue, dp) {
+      if (!dp) {
+        return String(intValue);
+      }
+      const negative = intValue < 0;
+      let digits = String(Math.abs(intValue)).padStart(dp + 1, "0");
+      let whole = digits.slice(0, digits.length - dp);
+      let frac = digits.slice(digits.length - dp).replace(/0+$/, "");
+      return (negative ? "−" : "") + whole + (frac ? "." + frac : "");
+    }
+
+    function chooseTable(year) {
+      const s = yearSettings[year];
+      if (s.review.length && Math.random() < 0.25) {
+        return pick(s.review);
+      }
+      return pick(s.focus);
+    }
+
+    // ---------- Multiplication strategies ----------
+    function multiplyStrategy(t, n) {
+      const p = t * n;
+      const d = 2 * n;
+      switch (t) {
+        case 2:
+          return [{ line: `${n} + ${n} = ${p}`, text: `× 2 means double. Double ${n} is ${p}.` }];
+        case 10:
+          return [{ line: `${n} × 10 = ${p}`, text: `× 10: each digit moves one place to the left, and a zero holds the ones place.` }];
+        case 5:
+          return [
+            { line: `${n} × 10 = ${10 * n}`, text: `Start with × 10. That one is easy: ${n} × 10 = ${10 * n}.` },
+            { line: `half of ${10 * n} = ${p}`, text: `× 5 is half of × 10, so halve ${10 * n}.` }
+          ];
+        case 4:
+          return [
+            { line: `${n} × 2 = ${d}`, text: `Double ${n} once to get × 2.` },
+            { line: `${d} × 2 = ${p}`, text: `Double again. × 4 is double, double.` }
+          ];
+        case 8:
+          return [
+            { line: `${n} × 2 = ${d}`, text: `Double ${n} to get × 2.` },
+            { line: `${d} × 2 = ${2 * d}`, text: `Double again to get × 4.` },
+            { line: `${2 * d} × 2 = ${p}`, text: `Double one more time. × 8 is double, double, double.` }
+          ];
+        case 3:
+          return [
+            { line: `${n} × 2 = ${d}`, text: `Start with double: ${n} × 2 = ${d}.` },
+            { line: `${d} + ${n} = ${p}`, text: `Add one more group of ${n} to make 3 groups.` }
+          ];
+        case 6:
+          return [
+            { line: `${n} × 5 = ${5 * n}`, text: `Start with × 5 (half of × 10): ${n} × 5 = ${5 * n}.` },
+            { line: `${5 * n} + ${n} = ${p}`, text: `Add one more group of ${n} to make 6 groups.` }
+          ];
+        case 7:
+          return [
+            { line: `${n} × 5 = ${5 * n}`, text: `Split 7 into 5 and 2. First, ${n} × 5 = ${5 * n}.` },
+            { line: `${n} × 2 = ${d}`, text: `Then ${n} × 2 = ${d}.` },
+            { line: `${5 * n} + ${d} = ${p}`, text: `5 groups + 2 groups = 7 groups. Add them together.` }
+          ];
+        case 9:
+          return [
+            { line: `${n} × 10 = ${10 * n}`, text: `Start with × 10: ${n} × 10 = ${10 * n}.` },
+            { line: `${10 * n} − ${n} = ${p}`, text: `× 9 is one group less than × 10, so take away one ${n}.` }
+          ];
+        case 11:
+          return [
+            { line: `${n} × 10 = ${10 * n}`, text: `Start with × 10: ${n} × 10 = ${10 * n}.` },
+            { line: `${10 * n} + ${n} = ${p}`, text: `× 11 is one more group than × 10, so add one ${n}.` }
+          ];
+        case 12:
+          return [
+            { line: `${n} × 10 = ${10 * n}`, text: `Split 12 into 10 and 2. First, ${n} × 10 = ${10 * n}.` },
+            { line: `${n} × 2 = ${d}`, text: `Then ${n} × 2 = ${d}.` },
+            { line: `${10 * n} + ${d} = ${p}`, text: `10 groups + 2 groups = 12 groups. Add them together.` }
+          ];
+        default:
+          return [];
+      }
+    }
+
+    // ---------- Division strategies ----------
+    function divideStrategy(d, q) {
+      const p = d * q;
+      const steps = [];
+      if (d === 2) {
+        steps.push({ line: `half of ${p} = ${q}`, text: `÷ 2 means halve. Half of ${p} is ${q}.` });
+      } else if (d === 4) {
+        steps.push({ line: `half of ${p} = ${p / 2}`, text: `÷ 4 is halve, then halve again. Halve ${p} first.` });
+        steps.push({ line: `half of ${p / 2} = ${q}`, text: `Now halve ${p / 2}.` });
+      } else if (d === 8) {
+        steps.push({ line: `half of ${p} = ${p / 2}`, text: `÷ 8 is halve three times. Halve ${p}.` });
+        steps.push({ line: `half of ${p / 2} = ${p / 4}`, text: `Halve again.` });
+        steps.push({ line: `half of ${p / 4} = ${q}`, text: `Halve one more time.` });
+      } else if (d === 10) {
+        steps.push({ line: `${p} ÷ 10 = ${q}`, text: `÷ 10: each digit moves one place to the right.` });
+      } else if (d === 5) {
+        steps.push({ line: `${p} × 2 = ${2 * p}`, text: `÷ 5 is the same as double, then ÷ 10. Double ${p} first.` });
+        steps.push({ line: `${2 * p} ÷ 10 = ${q}`, text: `Now ÷ 10: each digit moves one place to the right.` });
+      } else if (q <= 4) {
+        const jumps = [];
+        for (let i = 1; i <= q; i += 1) {
+          jumps.push(d * i);
+        }
+        steps.push({ line: jumps.join(", "), text: `Count up in ${d}s until you reach ${p}. That is ${q} jumps.` });
+      } else {
+        const a = q >= 10 ? 10 : 5;
+        if (q === a) {
+          steps.push({ line: `${d} × ${a} = ${p}`, text: `That is a fact you know: ${d} × ${a} = ${p}.` });
+        } else {
+          const chunk = d * a;
+          const left = p - chunk;
+          steps.push({ line: `${d} × ${a} = ${chunk}`, text: `Start with a fact you know: ${a} groups of ${d} is ${chunk}.` });
+          steps.push({ line: `${p} − ${chunk} = ${left}`, text: `How much is left? ${p} − ${chunk} = ${left}.` });
+          steps.push({ line: `${left} ÷ ${d} = ${q - a}`, text: `${left} is ${q - a} more group${q - a === 1 ? "" : "s"} of ${d}.` });
+          steps.push({ line: `${a} + ${q - a} = ${q}`, text: `Add the groups: ${a} + ${q - a} = ${q}.` });
+        }
+      }
+      return steps;
+    }
+
+    function familyFacts(x, y, p) {
+      const facts = [`${x} × ${y} = ${p}`];
+      if (x !== y) {
+        facts.push(`${y} × ${x} = ${p}`);
+      }
+      facts.push(`${p} ÷ ${x} = ${y}`);
+      if (x !== y) {
+        facts.push(`${p} ÷ ${y} = ${x}`);
+      }
+      return facts;
+    }
+
+    // ---------- Question generators ----------
+    // Each question: text, answer, steps (strategy lines), family (fact family list)
+    function basicMultiply(year) {
+      const s = yearSettings[year];
+      const t = chooseTable(year);
+      const n = randomInteger(2, s.max);
+      const p = t * n;
+      const tableFirst = Math.random() < 0.5;
+      const a = tableFirst ? t : n;
+      const b = tableFirst ? n : t;
+      const steps = [{ line: `${n} × ${t}`, text: `Use the ${t} times table: ${n} lots of ${t}.${a !== t ? ` (${a} × ${b} is the same as ${b} × ${a}.)` : ""}` }];
+      steps.push(...multiplyStrategy(t, n));
+      return {
+        text: `${a} × ${b}`,
+        answer: String(p),
+        steps,
+        answerNote: t === n ? `${t} × ${t} is a square number.` : `Check it with the turnaround: ${b} × ${a} = ${p}.`,
+        family: familyFacts(a, b, p)
+      };
+    }
+
+    function basicDivide(year) {
+      const s = yearSettings[year];
+      const d = chooseTable(year);
+      const q = randomInteger(2, s.max);
+      const p = d * q;
+      const steps = [{ line: `${d} × ? = ${p}`, text: `Turn it into a times table question: what times ${d} makes ${p}?` }];
+      steps.push(...divideStrategy(d, q));
+      return {
+        text: `${p} ÷ ${d}`,
+        answer: String(q),
+        steps,
+        answerNote: `Check: ${d} × ${q} = ${p}.`,
+        family: familyFacts(d, q, p)
+      };
+    }
+
+    // Year 8: basic facts with bigger numbers and decimals
+    function extendedMultiply() {
+      const t = pick(yearSettings[8].focus);
+      const n = randomInteger(2, 9);
+      const base = t * n;
+      const kind = pick(["tens", "hundreds", "both", "decimal", "decimal"]);
+      let ansInt = base, ansDp = 0, scaleLine, scaleText;
+      let x = String(t), y = String(n);
+      if (kind === "tens") {
+        y = String(n * 10);
+        ansInt = base * 10;
+        scaleLine = `${base} × 10 = ${ansInt}`;
+        scaleText = `${y} is 10 times bigger than ${n}, so the answer is 10 times bigger.`;
+      } else if (kind === "hundreds") {
+        y = String(n * 100);
+        ansInt = base * 100;
+        scaleLine = `${base} × 100 = ${ansInt}`;
+        scaleText = `${y} is 100 times bigger than ${n}, so the answer is 100 times bigger.`;
+      } else if (kind === "both") {
+        x = String(t * 10);
+        y = String(n * 10);
+        ansInt = base * 100;
+        scaleLine = `${base} × 100 = ${ansInt}`;
+        scaleText = `${x} and ${y} are each 10 times bigger, so the answer is 10 × 10 = 100 times bigger.`;
+      } else {
+        x = fmt(t, 1);
+        ansDp = 1;
+        scaleLine = `${base} ÷ 10 = ${fmt(base, 1)}`;
+        scaleText = `${x} is 10 times smaller than ${t}, so the answer is 10 times smaller.`;
+      }
+      const answer = fmt(ansInt, ansDp);
+      const swap = Math.random() < 0.5;
+      const a = swap ? y : x;
+      const b = swap ? x : y;
+      return {
+        text: `${a} × ${b}`,
+        answer,
+        steps: [
+          { line: `${t} × ${n} = ${base}`, text: `Find the basic fact first: ${t} × ${n} = ${base}.` },
+          { line: scaleLine, text: scaleText }
+        ],
+        answerNote: `Place value check: does the size of the answer make sense?`,
+        family: familyFacts(a, b, answer)
+      };
+    }
+
+    function extendedDivide() {
+      const d = pick(yearSettings[8].focus);
+      const q = randomInteger(2, 9);
+      const base = d * q;
+      const kind = pick(["tens", "hundreds", "decimal", "decimal", "same"]);
+      let dividend, divisor = String(d), answer, scaleLine, scaleText;
+      if (kind === "tens") {
+        dividend = String(base * 10);
+        answer = String(q * 10);
+        scaleLine = `${q} × 10 = ${answer}`;
+        scaleText = `${dividend} is 10 times bigger than ${base}, so the answer is 10 times bigger.`;
+      } else if (kind === "hundreds") {
+        dividend = String(base * 100);
+        answer = String(q * 100);
+        scaleLine = `${q} × 100 = ${answer}`;
+        scaleText = `${dividend} is 100 times bigger than ${base}, so the answer is 100 times bigger.`;
+      } else if (kind === "decimal") {
+        dividend = fmt(base, 1);
+        answer = fmt(q, 1);
+        scaleLine = `${q} ÷ 10 = ${answer}`;
+        scaleText = `${dividend} is 10 times smaller than ${base}, so the answer is 10 times smaller.`;
+      } else {
+        dividend = String(base * 10);
+        divisor = String(d * 10);
+        answer = String(q);
+        scaleLine = `${dividend} ÷ ${divisor} = ${base} ÷ ${d}`;
+        scaleText = `Both numbers are 10 times bigger, so the answer stays the same as ${base} ÷ ${d}.`;
+      }
+      return {
+        text: `${dividend} ÷ ${divisor}`,
+        answer,
+        steps: [
+          { line: `${base} ÷ ${d} = ${q}`, text: `Find the basic fact first: ${base} ÷ ${d} = ${q}.` },
+          { line: scaleLine, text: scaleText }
+        ],
+        answerNote: `Check: ${divisor} × ${answer} = ${dividend}.`,
+        family: familyFacts(divisor, answer, dividend)
+      };
+    }
+
+    function generateQuestion(year) {
+      if (yearSettings[year].extended) {
+        return DIV ? extendedDivide() : extendedMultiply();
+      }
+      return DIV ? basicDivide(year) : basicMultiply(year);
+    }
+
+    // A new question that is different from the last one
+    function freshQuestion(year, avoid) {
+      let q = generateQuestion(year);
+      for (let i = 0; i < 30 && avoid.has(q.text); i += 1) {
+        q = generateQuestion(year);
+      }
+      return q;
+    }
+
+    // Lines on the One Fact board: strategy steps, the answer, then the fact family
+    function boardLines() {
+      const lines = question.steps.map(step => ({ kind: "step", line: step.line, text: step.text }));
+      lines.push({ kind: "answer", line: `${question.text} = ${question.answer}`, text: `${question.text} = ${question.answer}. ${question.answerNote}` });
+      lines.push({ kind: "family", facts: question.family, text: question.family.length === 2 ? "Fact family: a square number has one multiplication and one division fact." : "Fact family: one fact gives you four." });
+      return lines;
+    }
+
+    // ---------- Rendering ----------
+    function renderLevels() {
+      levelGrid.innerHTML = "";
+      Object.keys(yearSettings).forEach(key => {
+        const year = Number(key);
+        const button = document.createElement("button");
+        button.className = "level-button";
+        button.classList.toggle("is-active", year === currentYear);
+        button.type = "button";
+        button.innerHTML = `<strong>Year ${year}</strong><span>${yearLabels[year][0]}</span>`;
+        button.addEventListener("click", () => {
+          currentYear = year;
+          if (mode === "one") {
+            newQuestion();
+          } else {
+            newSet();
+          }
+        });
+        levelGrid.appendChild(button);
+      });
+      yearBadgeLabel.textContent = `Year ${currentYear}`;
+      yearBadgeText.textContent = yearLabels[currentYear][1];
+    }
+
+    function renderHints() {
+      const list = document.getElementById("hintList");
+      list.innerHTML = "";
+      hints.forEach(([title, body, example]) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<button class="hint-toggle" type="button" aria-expanded="false"></button><div class="hint-body" hidden></div>`;
+        li.querySelector(".hint-toggle").textContent = title;
+        const bodyEl = li.querySelector(".hint-body");
+        bodyEl.textContent = body;
+        const ex = document.createElement("span");
+        ex.className = "hint-example";
+        ex.textContent = example;
+        bodyEl.appendChild(ex);
+        list.appendChild(li);
+      });
+      list.querySelectorAll(".hint-toggle").forEach(button => {
+        const body = button.nextElementSibling;
+        button.addEventListener("click", () => {
+          const isRevealed = button.getAttribute("aria-expanded") === "true";
+          button.setAttribute("aria-expanded", isRevealed ? "false" : "true");
+          button.classList.toggle("is-revealed", !isRevealed);
+          body.hidden = isRevealed;
+        });
+      });
+    }
+
+    function makeLine(tag, content, state, extraClass) {
+      const row = document.createElement("div");
+      row.className = `line ${state} ${extraClass || ""}`.trim();
+      const tagEl = document.createElement("span");
+      tagEl.className = "line-tag";
+      tagEl.textContent = tag;
+      const box = document.createElement("div");
+      box.className = "line-box";
+      box.appendChild(content);
+      if (state === "is-next") {
+        box.addEventListener("click", revealNext);
+      }
+      row.append(tagEl, box);
+      return row;
+    }
+
+    function renderBoard() {
+      board.innerHTML = "";
+      const lines = boardLines();
+      lines.forEach((item, index) => {
+        const state = index < revealed ? "is-revealed" : (index === revealed && !covered ? "is-next" : "");
+        let content;
+        if (item.kind === "family") {
+          content = document.createElement("div");
+          content.className = "family-grid";
+          item.facts.forEach(fact => {
+            const span = document.createElement("span");
+            span.className = "txt";
+            span.textContent = fact;
+            content.appendChild(span);
+          });
+        } else {
+          content = document.createElement("span");
+          content.className = "txt";
+          content.textContent = item.line;
+        }
+        if (item.kind === "answer") {
+          const rule = document.createElement("div");
+          rule.className = "rule";
+          board.appendChild(rule);
+        }
+        const tag = item.kind === "answer" ? "=" : item.kind === "family" ? "ff" : String(index + 1);
+        board.appendChild(makeLine(tag, content, state, item.kind === "answer" ? "is-answer" : ""));
+      });
+    }
+
+    // Size the text so every line fits the space without scrolling
+    function fitBoard() {
+      if (mode !== "one" || !question) {
+        return;
+      }
+      const lines = boardLines();
+      let longest = 0;
+      let rows = 0.1;
+      lines.forEach(item => {
+        if (item.kind === "family") {
+          const half = Math.ceil(item.facts.length / 2);
+          const widest = Math.max(...item.facts.map(f => f.length));
+          longest = Math.max(longest, (widest * (item.facts.length > 1 ? 2 : 1) + 2) * 0.72);
+          rows += 1.55 * 0.72 * half + 0.6;
+        } else {
+          longest = Math.max(longest, item.line.length * (item.kind === "answer" ? 1.15 : 1));
+          rows += item.kind === "answer" ? 1.95 : 1.75;
+        }
+      });
+      rows += lines.length * 0.32 + 0.4;
+      const widthUnits = longest * 0.6 + 1.1 + 0.35 + 1.4;
+      const availableWidth = boardArea.clientWidth * 0.94;
+      const availableHeight = boardArea.clientHeight * 0.92;
+      const fs = Math.max(14, Math.min(availableWidth / widthUnits, availableHeight / rows, 64));
+      board.style.setProperty("--fs", `${Math.floor(fs)}px`);
+    }
+
+    function renderStepText() {
+      const lines = boardLines();
+      if (covered) {
+        stepText.textContent = "Think, then write your answer on your whiteboard. Show me!";
+        stepText.classList.add("is-prompt");
+      } else if (revealed === 0) {
+        stepText.textContent = "Click the highlighted box to see the strategy one step at a time.";
+        stepText.classList.add("is-prompt");
+      } else {
+        stepText.textContent = lines[Math.min(revealed, lines.length) - 1].text;
+        stepText.classList.remove("is-prompt");
+      }
+    }
+
+    function renderOne() {
+      boardArea.classList.toggle("is-covered", covered);
+      layoutCover.hidden = !covered;
+      workoutTitle.textContent = covered ? "Answer on your whiteboard" : "Click the highlighted box to reveal each step";
+      questionTag.textContent = "Question";
+      questionDisplay.classList.remove("timer-display", "is-running");
+      questionDisplay.innerHTML = "";
+      questionDisplay.append(`${question.text} =`);
+      if (revealed >= boardLines().length - 1) {
+        questionDisplay.append(` ${question.answer}`);
+      } else {
+        const blank = document.createElement("span");
+        blank.className = "blank";
+        questionDisplay.appendChild(blank);
+      }
+      renderBoard();
+      renderStepText();
+      fitBoard();
+    }
+
+    // ---------- Quick-fire ----------
+    function formatTime(ms) {
+      const total = Math.floor(ms / 1000);
+      const m = Math.floor(total / 60);
+      const s = total % 60;
+      return `${m}:${String(s).padStart(2, "0")}`;
+    }
+
+    function timerNow() {
+      return timerElapsed + (timerId ? Date.now() - timerStart : 0);
+    }
+
+    function renderTimer() {
+      questionDisplay.textContent = formatTime(timerNow());
+      questionDisplay.classList.add("timer-display");
+      questionDisplay.classList.toggle("is-running", Boolean(timerId));
+    }
+
+    function startTimer() {
+      if (timerId) {
+        return;
+      }
+      timerStart = Date.now();
+      timerId = setInterval(renderTimer, 250);
+    }
+
+    function stopTimer() {
+      if (!timerId) {
+        return;
+      }
+      timerElapsed += Date.now() - timerStart;
+      clearInterval(timerId);
+      timerId = null;
+    }
+
+    function resetTimer() {
+      stopTimer();
+      timerElapsed = 0;
+    }
+
+    function newSet() {
+      resetTimer();
+      const seen = new Set();
+      qfSet = [];
+      for (let i = 0; i < qfCount; i += 1) {
+        const q = freshQuestion(currentYear, seen);
+        seen.add(q.text);
+        qfSet.push(q);
+      }
+      qfShown = new Set();
+      renderLevels();
+      renderQuick();
+    }
+
+    function qfColumns() {
+      const wide = boardArea.clientWidth > 640;
+      if (qfCount <= 10) {
+        return wide ? 2 : 1;
+      }
+      return wide ? 3 : 2;
+    }
+
+    function renderQuick() {
+      boardArea.classList.remove("is-covered");
+      layoutCover.hidden = true;
+      questionTag.textContent = `Quick-fire · ${qfCount} facts`;
+      workoutTitle.textContent = "Write the answers in your book. Click a fact to check it.";
+      qfGrid.innerHTML = "";
+      const cols = qfColumns();
+      const rowsPerCol = Math.ceil(qfSet.length / cols);
+      qfGrid.style.gridTemplateRows = `repeat(${rowsPerCol}, max-content)`;
+      qfSet.forEach((q, i) => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "qf-item";
+        item.classList.toggle("is-revealed", qfShown.has(i));
+        item.innerHTML = `<span class="qf-num"></span><span class="qf-q"></span><span class="qf-a"><span class="txt"></span></span>`;
+        item.querySelector(".qf-num").textContent = `${i + 1}.`;
+        item.querySelector(".qf-q").textContent = `${q.text} =`;
+        item.querySelector(".qf-a .txt").textContent = q.answer;
+        item.addEventListener("click", () => {
+          if (qfShown.has(i)) {
+            qfShown.delete(i);
+          } else {
+            qfShown.add(i);
+          }
+          renderQuick();
+        });
+        qfGrid.appendChild(item);
+      });
+      const allShown = qfShown.size === qfSet.length;
+      btnNext.textContent = timerId ? "Stop Timer" : (timerNow() > 0 ? "Restart Timer" : "Start Timer");
+      btnAll.textContent = allShown ? "Hide Answers" : "Reveal Answers";
+      btnHide.textContent = `Facts: ${qfCount}`;
+      if (timerId) {
+        stepText.textContent = "Go! Answer as many as you can. Skip any you are stuck on and come back.";
+        stepText.classList.remove("is-prompt");
+      } else if (allShown) {
+        stepText.textContent = `Mark your answers. Time: ${formatTime(timerNow())}. Can you beat it next time?`;
+        stepText.classList.remove("is-prompt");
+      } else if (timerNow() > 0) {
+        stepText.textContent = `Stopped at ${formatTime(timerNow())}. Reveal the answers and mark your work.`;
+        stepText.classList.remove("is-prompt");
+      } else {
+        stepText.textContent = `Number your book 1 to ${qfCount}. Press Start Timer when everyone is ready.`;
+        stepText.classList.add("is-prompt");
+      }
+      renderTimer();
+      fitQuick();
+    }
+
+    function fitQuick() {
+      if (mode !== "quick" || !qfSet.length) {
+        return;
+      }
+      const cols = qfColumns();
+      const rowsPerCol = Math.ceil(qfSet.length / cols);
+      const longest = Math.max(...qfSet.map(q => `${q.text} =`.length));
+      // item width in em: number + question + answer box + padding and gaps
+      const itemEm = 1.3 + longest * 0.6 + 2.6 + 0.6 + 0.6;
+      const widthUnits = cols * itemEm + (cols - 1) * 0.7;
+      const heightUnits = rowsPerCol * 1.6 + (rowsPerCol - 1) * 0.28;
+      const availableWidth = boardArea.clientWidth * 0.96;
+      const availableHeight = boardArea.clientHeight * 0.96;
+      const size = Math.max(12, Math.min(availableWidth / widthUnits, availableHeight / heightUnits, 46));
+      qfGrid.style.setProperty("--qfs", `${Math.floor(size)}px`);
+    }
+
+    // ---------- Mode + controls ----------
+    function setMode(next) {
+      if (mode === next) {
+        return;
+      }
+      mode = next;
+      document.querySelectorAll(".mode-button").forEach(button => {
+        button.classList.toggle("is-active", button.dataset.mode === mode);
+      });
+      board.hidden = mode !== "one";
+      qfGrid.hidden = mode !== "quick";
+      if (mode === "one") {
+        resetTimer();
+        btnNew.textContent = "New Question";
+        btnNext.textContent = "Reveal Next";
+        btnAll.textContent = "Reveal All";
+        btnHide.textContent = "Cover Workout";
+        newQuestion();
+      } else {
+        btnNew.textContent = "New Set";
+        newSet();
+      }
+    }
+
+    function render() {
+      renderLevels();
+      if (mode === "one") {
+        renderOne();
+      } else {
+        renderQuick();
+      }
+    }
+
+    function uncover() {
+      covered = false;
+      renderOne();
+    }
+
+    function revealNext() {
+      if (covered) {
+        uncover();
+      } else if (revealed < boardLines().length) {
+        revealed += 1;
+        renderOne();
+      }
+    }
+
+    function newQuestion() {
+      question = freshQuestion(currentYear, new Set([lastText]));
+      lastText = question.text;
+      revealed = 0;
+      covered = true;
+      render();
+    }
+
+    btnNew.addEventListener("click", () => {
+      if (mode === "one") {
+        newQuestion();
+      } else {
+        newSet();
+      }
+    });
+
+    btnNext.addEventListener("click", () => {
+      if (mode === "one") {
+        revealNext();
+      } else if (timerId) {
+        stopTimer();
+        renderQuick();
+      } else {
+        if (timerNow() > 0) {
+          resetTimer();
+        }
+        startTimer();
+        renderQuick();
+      }
+    });
+
+    btnAll.addEventListener("click", () => {
+      if (mode === "one") {
+        covered = false;
+        revealed = boardLines().length;
+        renderOne();
+      } else {
+        stopTimer();
+        if (qfShown.size === qfSet.length) {
+          qfShown = new Set();
+        } else {
+          qfShown = new Set(qfSet.map((_, i) => i));
+        }
+        renderQuick();
+      }
+    });
+
+    btnHide.addEventListener("click", () => {
+      if (mode === "one") {
+        covered = true;
+        revealed = 0;
+        renderOne();
+      } else {
+        qfCount = qfCount === 10 ? 20 : qfCount === 20 ? 30 : 10;
+        newSet();
+      }
+    });
+
+    layoutCover.addEventListener("click", uncover);
+
+    document.querySelectorAll(".mode-button").forEach(button => {
+      button.addEventListener("click", () => setMode(button.dataset.mode));
+    });
+
+    window.addEventListener("resize", () => {
+      if (mode === "one") {
+        fitBoard();
+      } else {
+        renderQuick();
+      }
+    });
+
+    document.querySelectorAll("[data-page]").forEach(link => {
+      link.addEventListener("click", event => {
+        if (window.google && google.script && google.script.run) {
+          event.preventDefault();
+          google.script.run
+            .withSuccessHandler(html => {
+              document.open();
+              document.write(html);
+              document.close();
+            })
+            .withFailureHandler(function (error) {
+              alert("Could not open the page \"" + link.getAttribute("data-page") + "\". Check there is an HTML file with exactly that name in Apps Script, then deploy a new version.\n\n" + (error && error.message ? error.message : error));
+            })
+            .loadPage(link.getAttribute("data-page"));
+        }
+      });
+    });
+
+    renderHints();
+    newQuestion();
+  </script>
+</body>
+</html>

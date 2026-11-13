@@ -7,6 +7,9 @@ const FILE_FALLBACKS = {
   'subtraction': ['subtraction', 'Subtraction Workout'],
   'multiplication': ['multiplication', 'Multiplication Workout'],
   'division': ['division', 'Division Workout'],
+  'basic-facts': ['basic-facts', 'Basic Facts'],
+  'times-tables': ['times-tables', 'Times Tables'],
+  'division-facts': ['division-facts', 'Division Facts'],
   'protractor': ['protractor', 'Protractor'],
   'complementary-angles': ['complementary-angles', 'Complementary Angles'],
   'supplementary-angles': ['supplementary-angles', 'Supplementary Angles']
